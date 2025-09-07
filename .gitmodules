@@ -1,0 +1,3 @@
+[submodule "libs/LibraC"]
+	path = libs/LibraC
+	url = git@github.com:frazchaudhry/LibraC.git
