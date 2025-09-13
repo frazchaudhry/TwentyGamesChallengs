@@ -14,7 +14,7 @@ SDL_AppResult SDL_AppInit([[maybe_unused]]void **appstate, [[maybe_unused]]int a
     backingBuffer = malloc(STARTING_ARENA_SIZE);
     LC_Arena_Initialize(&arena, backingBuffer, STARTING_ARENA_SIZE);
 
-    LC_GL_Renderer *renderer = (LC_GL_Renderer*)LC_Arena_Allocate(&arena, sizeof(LC_GL_Renderer));
+    const auto renderer = static_cast<LC_GL_Renderer*>(LC_Arena_Allocate(&arena, sizeof(LC_GL_Renderer)));
     LC_GL_InitializeRenderer(&arena, renderer, 800, 600);
 
     *appstate = renderer;
@@ -31,7 +31,7 @@ SDL_AppResult SDL_AppInit([[maybe_unused]]void **appstate, [[maybe_unused]]int a
 }
 
 SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event) {
-    LC_GL_Renderer *renderer = (LC_GL_Renderer*)appstate;
+    const auto renderer = static_cast<LC_GL_Renderer*>(appstate);
     if (event->key.key == SDLK_ESCAPE ||
         event->type == SDL_EVENT_QUIT) {
         return SDL_APP_SUCCESS;  /* end the program, reporting success to the OS. */
@@ -45,13 +45,20 @@ SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event) {
 }
 
 SDL_AppResult SDL_AppIterate(void *appstate) {
-    LC_GL_Renderer *renderer = (LC_GL_Renderer*)appstate;
+    const auto renderer = static_cast<LC_GL_Renderer*>(appstate);
     char errorLog[1024];
 
     // Clear background
-    LC_GL_ClearBackground(LC_Color_Create(51.0f, 51.0f, 76.5f, 1.0f));
+    LC_GL_ClearBackground(LC_Color_Create(0.0f, 0.0f, 0.5f, 1.0f));
 
     // Render
+    constexpr LC_GL_Text textToShow = {
+        .string = (char*)"Making Pong!",
+        .position = { 300, 300, 0.0f },
+        .color = { 255, 255, 255, 1.0 },
+        .scale = 2.0f
+    };
+    LC_GL_RenderText(renderer, &textToShow);
 
     // Swap buffers
     if (!LC_GL_SwapBuffer(renderer->window, errorLog)) {
@@ -61,6 +68,14 @@ SDL_AppResult SDL_AppIterate(void *appstate) {
     return SDL_APP_CONTINUE;
 }
 
-void SDL_AppQuit([[maybe_unused]]void *appstate, [[maybe_unused]]SDL_AppResult result) {
+void SDL_AppQuit(void *appstate, SDL_AppResult result) {
+    const auto renderer = static_cast<LC_GL_Renderer*>(appstate);
+
+    LC_GL_FreeResources(renderer);
+    LC_Arena_FreeAll(&arena);
+    free(backingBuffer);
+    SDL_Log("%s", "");
+    if (result == SDL_APP_SUCCESS) SDL_Log("Exiting with status EXIT_SUCCESS");
+    else SDL_Log("Exiting with status EXIT_FAILURE");
     SDL_Quit();
 }
