@@ -15,9 +15,9 @@ else
 endif
 badd +26 src/pong.cpp
 badd +13 CMakeLists.txt
-badd +15 src/Game.hpp
-badd +1 src/Game.cpp
-badd +0 include/Game.hpp
+badd +4 src/Game.hpp
+badd +12 src/Game.cpp
+badd +17 include/Game.hpp
 argglobal
 %argdel
 set stal=2
@@ -43,7 +43,6 @@ set winwidth=1
 exe 'vert 1resize ' . ((&columns * 153 + 153) / 307)
 exe 'vert 2resize ' . ((&columns * 153 + 153) / 307)
 argglobal
-balt src/pong.cpp
 setlocal foldmethod=manual
 setlocal foldexpr=0
 setlocal foldmarker={{{,}}}
@@ -54,12 +53,12 @@ setlocal foldnestmax=20
 setlocal foldenable
 silent! normal! zE
 let &fdl = &fdl
-let s:l = 26 - ((25 * winheight(0) + 40) / 81)
+let s:l = 17 - ((16 * winheight(0) + 40) / 81)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
-keepjumps 26
-normal! 0
+keepjumps 17
+normal! 068|
 wincmd w
 argglobal
 if bufexists(fnamemodify("CMakeLists.txt", ":p")) | buffer CMakeLists.txt | else | edit CMakeLists.txt | endif
@@ -77,14 +76,15 @@ setlocal foldnestmax=20
 setlocal foldenable
 silent! normal! zE
 let &fdl = &fdl
-let s:l = 13 - ((12 * winheight(0) + 40) / 81)
+let s:l = 48 - ((47 * winheight(0) + 40) / 81)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
-keepjumps 13
-normal! 0
+keepjumps 48
+normal! 0127|
 lcd ~/Programs/DevProjects/TwentyGamesChallenge/Pong
 wincmd w
+2wincmd w
 exe 'vert 1resize ' . ((&columns * 153 + 153) / 307)
 exe 'vert 2resize ' . ((&columns * 153 + 153) / 307)
 tabnext
@@ -118,19 +118,20 @@ setlocal foldnestmax=20
 setlocal foldenable
 silent! normal! zE
 let &fdl = &fdl
-let s:l = 2 - ((1 * winheight(0) + 40) / 81)
+let s:l = 5 - ((4 * winheight(0) + 40) / 81)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
-keepjumps 2
+keepjumps 5
 normal! 0
 lcd ~/Programs/DevProjects/TwentyGamesChallenge/Pong
 wincmd w
 argglobal
-if bufexists(fnamemodify("~/Programs/DevProjects/TwentyGamesChallenge/Pong/include/Game.hpp", ":p")) | buffer ~/Programs/DevProjects/TwentyGamesChallenge/Pong/include/Game.hpp | else | edit ~/Programs/DevProjects/TwentyGamesChallenge/Pong/include/Game.hpp | endif
+if bufexists(fnamemodify("~/Programs/DevProjects/TwentyGamesChallenge/Pong/src/Game.hpp", ":p")) | buffer ~/Programs/DevProjects/TwentyGamesChallenge/Pong/src/Game.hpp | else | edit ~/Programs/DevProjects/TwentyGamesChallenge/Pong/src/Game.hpp | endif
 if &buftype ==# 'terminal'
-  silent file ~/Programs/DevProjects/TwentyGamesChallenge/Pong/include/Game.hpp
+  silent file ~/Programs/DevProjects/TwentyGamesChallenge/Pong/src/Game.hpp
 endif
+balt ~/Programs/DevProjects/TwentyGamesChallenge/Pong/src/Game.cpp
 setlocal foldmethod=manual
 setlocal foldexpr=0
 setlocal foldmarker={{{,}}}
@@ -141,12 +142,12 @@ setlocal foldnestmax=20
 setlocal foldenable
 silent! normal! zE
 let &fdl = &fdl
-let s:l = 1 - ((0 * winheight(0) + 40) / 81)
+let s:l = 9 - ((8 * winheight(0) + 40) / 81)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
-keepjumps 1
-normal! 0
+keepjumps 9
+normal! 07|
 lcd ~/Programs/DevProjects/TwentyGamesChallenge/Pong
 wincmd w
 exe 'vert 1resize ' . ((&columns * 153 + 153) / 307)
