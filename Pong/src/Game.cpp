@@ -1,9 +1,6 @@
 #include "Game.hpp"
-#include <SDL3/SDL_log.h>
+#include <cstdio>
 #include <cstdlib>
-#include <libraVideo.h>
-#include <memory>
-#include <string>
 
 bool Game::Init(const int32 width, const int32 height) {
     backingBuffer = malloc(100 * 1024);
@@ -78,11 +75,27 @@ void Game::Render() {
     }
 
     // Render Score
+    RenderScore(player1Score, (vec3){ 400.0f - 60.0f, 110.0f, 0.0f });
+    RenderScore(player2Score, (vec3){ 400.0f + 25.0f, 110.0f, 0.0f });
+
 
     // Swap buffers
     if (!LC_GL_SwapBuffer(renderer->window, errorLog)) {
         SDL_Log("%s\n", errorLog);
     }
+}
+
+void Game::RenderScore(const int32 score, const vec3 pos) const {
+    char scoreString[2];
+    snprintf(scoreString, 2, "%d", score);
+    LC_GL_Text scoreText = {
+        .string = scoreString,
+        .position = { pos[0], pos[1], pos[2] },
+        .color = { 255.0f, 255.0f, 255.0f, 1.0f },
+        .scale = 2.0f
+    };
+
+    LC_GL_RenderText(renderer, &scoreText);
 }
 
 void Game::Unload() const {
@@ -93,6 +106,3 @@ void Game::Unload() const {
     free(backingBuffer);
 }
 
-Game::~Game() {
-
-}

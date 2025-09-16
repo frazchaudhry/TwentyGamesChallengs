@@ -17,7 +17,7 @@ struct GameState {
 class Game {
 public:
     Game() = default;
-    ~Game();
+    ~Game() = default;
 
     bool Init(int32 width, int32 height);
     void Setup();
@@ -37,6 +37,8 @@ private:
     std::vector<std::unique_ptr<Entity>> entities;
     int32 player1Score = 0;
     int32 player2Score = 0;
+
+    void RenderScore(int32 score, const vec3 pos) const;
 };
 
 #endif // GAME_HPP
