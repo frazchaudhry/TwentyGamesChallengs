@@ -1,16 +1,23 @@
 #include "Game.hpp"
+#include <SDL3/SDL_log.h>
 #include <cstdlib>
-#include <libraCore.h>
+#include <libraVideo.h>
+#include <memory>
+#include <string>
 
-bool Game::Init() {
+bool Game::Init(const int32 width, const int32 height) {
     backingBuffer = malloc(100 * 1024);
     arena = new LC_Arena();
     LC_Arena_Initialize(arena, backingBuffer, 100 * 1024);
 
     renderer = static_cast<LC_GL_Renderer*>(LC_Arena_Allocate(arena, sizeof(LC_GL_Renderer)));
-    LC_GL_InitializeRenderer(arena, renderer, 800, 600);
+    this->screenWidth = width;
+    this->screenHeight = height;
+    LC_GL_InitializeRenderer(arena, renderer, width, height);
 
-    if (LC_GL_InitializeVideo(arena, renderer, "Pong", "assets/fonts/pong-score-extended.ttf", errorLog)) {
+    fontFilePath = "assets/fonts/pong-score-extended.ttf";
+
+    if (LC_GL_InitializeVideo(arena, renderer, "Pong", fontFilePath.c_str(), errorLog)) {
         SDL_LogError(SDL_LOG_CATEGORY_VIDEO, "Could not initialize Video.%s", errorLog);
         return false;
     }
@@ -21,19 +28,38 @@ bool Game::Init() {
         return false;
     }
 
+    Setup();
+
     return true;
 }
 
-SDL_AppResult Game::ProcessInput(SDL_Event *event) {
+void Game::Setup() {
+    const LC_Color white = LC_Color_Create(255.0f, 255.0f, 255.0f, 1.0f);
+
+    // Setup Walls
+    entities.push_back(std::make_unique<Wall>("top", (LC_Rect){0, 0, screenWidth, 25}, white, true));
+    entities.push_back(std::make_unique<Wall>("bottom", (LC_Rect){0, screenHeight -25, screenWidth, 25}, white, true));
+
+    // Setup Divider
+    for (int32 i = 0, y = 40; y < 560; i++, y += 30) {
+        Divider divider;
+        divider.id = "divider-" + std::to_string(i+1);
+        divider.transform = { 400 - 5 / 2, y, 5, 20 };
+        divider.color = LC_Color_Create(255.0f, 255.0f, 255.0f, 0.3f);
+
+        entities.push_back(std::make_unique<Divider>(divider.id, divider.transform, divider.color));
+    }
+}
+
+SDL_AppResult Game::ProcessInput(const SDL_Event *event) {
     if (event->key.key == SDLK_ESCAPE ||
         event->type == SDL_EVENT_QUIT) {
         return SDL_APP_SUCCESS;  /* end the program, reporting success to the OS. */
     }
 
     if (renderer && event->type == SDL_EVENT_WINDOW_RESIZED) {
-        int width, height = 0;
-        SDL_GetWindowSize(renderer->window, &width, &height);
-        LC_GL_FramebufferSizeCallback(width, height);
+        SDL_GetWindowSize(renderer->window, &screenWidth, &screenHeight);
+        LC_GL_FramebufferSizeCallback(screenWidth, screenHeight);
     }
     return SDL_APP_CONTINUE;
 }
@@ -46,22 +72,20 @@ void Game::Render() {
     // Clear background
     LC_GL_ClearBackground(LC_Color_Create(0.0f, 0.0f, 0.5f, 1.0f));
 
-    constexpr LC_GL_Text textToShow = {
-        .string = (char*)"Making Pong!",
-        .position = { 300, 300, 0.0f },
-        .color = { 255, 255, 255, 1.0 },
-        .scale = 2.0f
-    };
-    LC_GL_RenderText(renderer, &textToShow);
+    // Render Entities
+    for (const auto &entity : entities) {
+        entity->Render(renderer);
+    }
+
+    // Render Score
 
     // Swap buffers
     if (!LC_GL_SwapBuffer(renderer->window, errorLog)) {
         SDL_Log("%s\n", errorLog);
     }
-
 }
 
-void Game::Unload() {
+void Game::Unload() const {
     LC_GL_FreeResources(renderer);
 
     LC_Arena_FreeAll(arena);

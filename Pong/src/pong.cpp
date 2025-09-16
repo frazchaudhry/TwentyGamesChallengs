@@ -8,7 +8,7 @@ Game *breakout;
 
 SDL_AppResult SDL_AppInit([[maybe_unused]]void **appstate, [[maybe_unused]]int argc, [[maybe_unused]]char *argv[]) {
     breakout = new Game();
-    if (!breakout->Init()) {
+    if (!breakout->Init(800, 600)) {
         SDL_Log("Could not initialize Game.");
         return SDL_APP_FAILURE;
     }
@@ -17,9 +17,9 @@ SDL_AppResult SDL_AppInit([[maybe_unused]]void **appstate, [[maybe_unused]]int a
 }
 
 SDL_AppResult SDL_AppEvent([[maybe_unused]]void *appstate, SDL_Event *event) {
-    const auto gameState = breakout->ProcessInput(event);
+    const auto sdlAppState = breakout->ProcessInput(event);
 
-    return gameState;
+    return sdlAppState;
 }
 
 SDL_AppResult SDL_AppIterate([[maybe_unused]]void *appstate) {
