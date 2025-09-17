@@ -5,6 +5,8 @@
 #include "Game.hpp"
 
 Game *breakout;
+double deltaTime = 0.0;
+uint64 lastFrame = 0;
 
 SDL_AppResult SDL_AppInit([[maybe_unused]]void **appstate, [[maybe_unused]]int argc, [[maybe_unused]]char *argv[]) {
     breakout = new Game();
@@ -24,7 +26,10 @@ SDL_AppResult SDL_AppEvent([[maybe_unused]]void *appstate, SDL_Event *event) {
 
 SDL_AppResult SDL_AppIterate([[maybe_unused]]void *appstate) {
     // Update
-    breakout->Update(0.0f);
+    uint64 currentFrame = SDL_GetPerformanceCounter();
+    deltaTime = static_cast<double>(static_cast<double>(currentFrame - lastFrame) / static_cast<double>(SDL_GetPerformanceFrequency()));
+    lastFrame = currentFrame;
+    breakout->Update(deltaTime);
 
     // Render
     breakout->Render();

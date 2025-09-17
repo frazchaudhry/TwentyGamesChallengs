@@ -1,5 +1,5 @@
 #include "Game.hpp"
-#include <cstdio>
+#include <SDL3/SDL_events.h>
 #include <cstdlib>
 
 bool Game::Init(const int32 width, const int32 height) {
@@ -20,7 +20,7 @@ bool Game::Init(const int32 width, const int32 height) {
     }
 
     // Disabling Vsync
-    if (!SDL_GL_SetSwapInterval(0)) {
+    if (!SDL_GL_SetSwapInterval(1)) {
         SDL_Log("Failed to disable Vsync.");
         return false;
     }
@@ -34,8 +34,8 @@ void Game::Setup() {
     const LC_Color white = LC_Color_Create(255.0f, 255.0f, 255.0f, 1.0f);
 
     // Setup Walls
-    entities.push_back(std::make_unique<Wall>("top", (LC_Rect){0, 0, screenWidth, 25}, white, true));
-    entities.push_back(std::make_unique<Wall>("bottom", (LC_Rect){0, screenHeight -25, screenWidth, 25}, white, true));
+    entities.emplace("top", std::make_unique<Wall>("top", (LC_Rect){0, 0, screenWidth, 25}, white, true));
+    entities.emplace("bottom", std::make_unique<Wall>("bottom", (LC_Rect){0, screenHeight -25, screenWidth, 25}, white, true));
 
     // Setup Divider
     for (int32 i = 0, y = 40; y < 560; i++, y += 30) {
@@ -44,8 +44,14 @@ void Game::Setup() {
         divider.transform = { 400 - 5 / 2, y, 5, 20 };
         divider.color = LC_Color_Create(255.0f, 255.0f, 255.0f, 0.3f);
 
-        entities.push_back(std::make_unique<Divider>(divider.id, divider.transform, divider.color));
+        entities.emplace(divider.id, std::make_unique<Divider>(divider.id, divider.transform, divider.color));
     }
+
+    // Setup Paddles
+    entities.emplace("leftPaddle", std::make_unique<Entity>("leftPaddle", (LC_Rect){ 25, 300 - PADDLE_HEIGHT / 2,
+        PADDLE_WIDTH, PADDLE_HEIGHT }, white));
+    entities.emplace("rightPaddle", std::make_unique<Entity>("rightPaddle", (LC_Rect){ 800 - (25 + PADDLE_WIDTH),
+        300 - PADDLE_HEIGHT / 2, PADDLE_WIDTH, PADDLE_HEIGHT }, white));
 }
 
 SDL_AppResult Game::ProcessInput(const SDL_Event *event) {
@@ -58,11 +64,42 @@ SDL_AppResult Game::ProcessInput(const SDL_Event *event) {
         SDL_GetWindowSize(renderer->window, &screenWidth, &screenHeight);
         LC_GL_FramebufferSizeCallback(screenWidth, screenHeight);
     }
+
+    if (event->key.key == SDLK_W && event->type == SDL_EVENT_KEY_DOWN) {
+        leftPaddleState = UP;
+    } else if ((event->key.key == SDLK_W && event->type == SDL_EVENT_KEY_UP) ||
+        (event->key.key == SDLK_S && event->type == SDL_EVENT_KEY_UP)) {
+        leftPaddleState = STOP;
+    } else if (event->key.key == SDLK_S && event->type == SDL_EVENT_KEY_DOWN) {
+        leftPaddleState = DOWN;
+    } 
+
+    if (event->key.key == SDLK_UP && event->type == SDL_EVENT_KEY_DOWN) {
+        rightPaddleState = UP;
+    } else if ((event->key.key == SDLK_UP && event->type == SDL_EVENT_KEY_UP) ||
+        (event->key.key == SDLK_DOWN && event->type == SDL_EVENT_KEY_UP)) {
+        rightPaddleState = STOP;
+    } else if (event->key.key == SDLK_DOWN && event->type == SDL_EVENT_KEY_DOWN) {
+        rightPaddleState = DOWN;
+    }
+
     return SDL_APP_CONTINUE;
 }
 
-void Game::Update([[maybe_unused]]float deltaTime) {
+void Game::Update(const double deltaTime) {
+    const auto leftPaddle = entities["leftPaddle"].get();
+    const auto rightPaddle = entities["rightPaddle"].get();
+    if (leftPaddleState == UP && leftPaddle->transform.y >= 25) {
+        leftPaddle->transform.y -= static_cast<int32>(static_cast<float>(PADDLE_VELOCITY) * deltaTime);
+    } else if (leftPaddleState == DOWN && leftPaddle->transform.y <= screenHeight - (PADDLE_HEIGHT + 25)) {
+        leftPaddle->transform.y += static_cast<int32>(static_cast<float>(PADDLE_VELOCITY) * deltaTime);
+    }
 
+    if (rightPaddleState == UP && rightPaddle->transform.y >= 25) {
+        rightPaddle->transform.y -= static_cast<int32>(static_cast<float>(PADDLE_VELOCITY) * deltaTime);
+    } else if (rightPaddleState == DOWN && rightPaddle->transform.y <= screenHeight - (PADDLE_HEIGHT + 25)) {
+        rightPaddle->transform.y += static_cast<int32>(static_cast<float>(PADDLE_VELOCITY) * deltaTime);
+    }
 }
 
 void Game::Render() {
@@ -71,7 +108,7 @@ void Game::Render() {
 
     // Render Entities
     for (const auto &entity : entities) {
-        entity->Render(renderer);
+        entity.second->Render(renderer);
     }
 
     // Render Score
@@ -88,10 +125,10 @@ void Game::Render() {
 void Game::RenderScore(const int32 score, const vec3 pos) const {
     char scoreString[2];
     snprintf(scoreString, 2, "%d", score);
-    LC_GL_Text scoreText = {
+    const LC_GL_Text scoreText = {
         .string = scoreString,
-        .position = { pos[0], pos[1], pos[2] },
-        .color = { 255.0f, 255.0f, 255.0f, 1.0f },
+        .position { pos[0], pos[1], pos[2] },
+        .color { 255.0f, 255.0f, 255.0f, 1.0f },
         .scale = 2.0f
     };
 
