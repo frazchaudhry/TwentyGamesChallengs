@@ -14,12 +14,6 @@ extern "C" {
 enum GameState {
 };
 
-enum PaddleState {
-    STOP,
-    UP,
-    DOWN
-};
-
 class Game {
 public:
     Game() = default;
@@ -43,11 +37,6 @@ private:
     std::map<std::string, std::unique_ptr<Entity>> entities;
     int32 player1Score { 0 };
     int32 player2Score { 0 };
-    const int32 PADDLE_WIDTH { 10 };
-    const int32 PADDLE_HEIGHT { 50 };
-    const int32 PADDLE_VELOCITY { 300 };
-    PaddleState leftPaddleState { STOP };
-    PaddleState rightPaddleState { STOP };
 
     void RenderScore(int32 score, const vec3 pos) const;
 };

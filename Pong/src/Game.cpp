@@ -1,6 +1,6 @@
 #include "Game.hpp"
-#include <SDL3/SDL_events.h>
 #include <cstdlib>
+#include <memory>
 
 bool Game::Init(const int32 width, const int32 height) {
     backingBuffer = malloc(100 * 1024);
@@ -35,7 +35,7 @@ void Game::Setup() {
 
     // Setup Walls
     entities.emplace("top", std::make_unique<Wall>("top", (LC_Rect){0, 0, screenWidth, 25}, white, true));
-    entities.emplace("bottom", std::make_unique<Wall>("bottom", (LC_Rect){0, screenHeight -25, screenWidth, 25}, white, true));
+    entities.emplace("bottom", std::make_unique<Wall>("bottom", (LC_Rect){0, screenHeight - 25, screenWidth, 25}, white, true));
 
     // Setup Divider
     for (int32 i = 0, y = 40; y < 560; i++, y += 30) {
@@ -48,10 +48,10 @@ void Game::Setup() {
     }
 
     // Setup Paddles
-    entities.emplace("leftPaddle", std::make_unique<Entity>("leftPaddle", (LC_Rect){ 25, 300 - PADDLE_HEIGHT / 2,
-        PADDLE_WIDTH, PADDLE_HEIGHT }, white));
-    entities.emplace("rightPaddle", std::make_unique<Entity>("rightPaddle", (LC_Rect){ 800 - (25 + PADDLE_WIDTH),
-        300 - PADDLE_HEIGHT / 2, PADDLE_WIDTH, PADDLE_HEIGHT }, white));
+    entities.emplace("leftPaddle", std::make_unique<Paddle>("leftPaddle", (LC_Rect){ 25, 300 - Paddle::PADDLE_HEIGHT / 2,
+        Paddle::PADDLE_WIDTH, Paddle::PADDLE_HEIGHT }, white));
+    entities.emplace("rightPaddle", std::make_unique<Paddle>("rightPaddle", (LC_Rect){ 800 - (25 + Paddle::PADDLE_WIDTH),
+        300 - Paddle::PADDLE_HEIGHT / 2, Paddle::PADDLE_WIDTH, Paddle::PADDLE_HEIGHT }, white));
 }
 
 SDL_AppResult Game::ProcessInput(const SDL_Event *event) {
@@ -65,41 +65,15 @@ SDL_AppResult Game::ProcessInput(const SDL_Event *event) {
         LC_GL_FramebufferSizeCallback(screenWidth, screenHeight);
     }
 
-    if (event->key.key == SDLK_W && event->type == SDL_EVENT_KEY_DOWN) {
-        leftPaddleState = UP;
-    } else if ((event->key.key == SDLK_W && event->type == SDL_EVENT_KEY_UP) ||
-        (event->key.key == SDLK_S && event->type == SDL_EVENT_KEY_UP)) {
-        leftPaddleState = STOP;
-    } else if (event->key.key == SDLK_S && event->type == SDL_EVENT_KEY_DOWN) {
-        leftPaddleState = DOWN;
-    } 
-
-    if (event->key.key == SDLK_UP && event->type == SDL_EVENT_KEY_DOWN) {
-        rightPaddleState = UP;
-    } else if ((event->key.key == SDLK_UP && event->type == SDL_EVENT_KEY_UP) ||
-        (event->key.key == SDLK_DOWN && event->type == SDL_EVENT_KEY_UP)) {
-        rightPaddleState = STOP;
-    } else if (event->key.key == SDLK_DOWN && event->type == SDL_EVENT_KEY_DOWN) {
-        rightPaddleState = DOWN;
-    }
+    entities["leftPaddle"]->ProcessInput(event);
+    entities["rightPaddle"]->ProcessInput(event);
 
     return SDL_APP_CONTINUE;
 }
 
 void Game::Update(const double deltaTime) {
-    const auto leftPaddle = entities["leftPaddle"].get();
-    const auto rightPaddle = entities["rightPaddle"].get();
-    if (leftPaddleState == UP && leftPaddle->transform.y >= 25) {
-        leftPaddle->transform.y -= static_cast<int32>(static_cast<float>(PADDLE_VELOCITY) * deltaTime);
-    } else if (leftPaddleState == DOWN && leftPaddle->transform.y <= screenHeight - (PADDLE_HEIGHT + 25)) {
-        leftPaddle->transform.y += static_cast<int32>(static_cast<float>(PADDLE_VELOCITY) * deltaTime);
-    }
-
-    if (rightPaddleState == UP && rightPaddle->transform.y >= 25) {
-        rightPaddle->transform.y -= static_cast<int32>(static_cast<float>(PADDLE_VELOCITY) * deltaTime);
-    } else if (rightPaddleState == DOWN && rightPaddle->transform.y <= screenHeight - (PADDLE_HEIGHT + 25)) {
-        rightPaddle->transform.y += static_cast<int32>(static_cast<float>(PADDLE_VELOCITY) * deltaTime);
-    }
+    entities["leftPaddle"]->Update(deltaTime, screenHeight);
+    entities["rightPaddle"]->Update(deltaTime, screenHeight);
 }
 
 void Game::Render() {
