@@ -64,9 +64,9 @@ void Paddle::Update(const double deltaTime, const int32 screenHeight) {
 Ball::Ball(std::string id, const LC_Rect pos, const LC_Color color) : Entity(std::move(id), pos, color) {}
 
 void Ball::Update(const double deltaTime, [[maybe_unused]]const int32 screenHeight) {
-    float speed = currentSpeed * (float)deltaTime;
-    vec2 currentPos = { (float)transform.x, (float)transform.y };
+    const float speed = currentSpeed * static_cast<float>(deltaTime);
+    vec2 currentPos = { static_cast<float>(transform.x), static_cast<float>(transform.y) };
     glm_vec2_muladds(direction, speed, currentPos);
-    transform.x = (int32)currentPos[0];
-    transform.y = (int32)currentPos[1];
+    transform.x = static_cast<int32>(currentPos[0]);
+    transform.y = static_cast<int32>(currentPos[1]);
 }
