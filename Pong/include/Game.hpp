@@ -12,6 +12,8 @@ extern "C" {
 #include "Entity.hpp"
 
 enum GameState {
+    GAME_ACTIVE,
+    GAME_START
 };
 
 class Game {
@@ -37,6 +39,7 @@ private:
     std::map<std::string, std::unique_ptr<Entity>> entities;
     int32 player1Score { 0 };
     int32 player2Score { 0 };
+    GameState state { GAME_START };
 
     void RenderScore(int32 score, const vec3 pos) const;
 };

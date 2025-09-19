@@ -1,5 +1,8 @@
 #include "Game.hpp"
+#include <SDL3/SDL_events.h>
+#include <SDL3/SDL_keycode.h>
 #include <cstdlib>
+#include <libraVideo.h>
 #include <memory>
 
 bool Game::Init(const int32 width, const int32 height) {
@@ -52,6 +55,10 @@ void Game::Setup() {
         Paddle::PADDLE_WIDTH, Paddle::PADDLE_HEIGHT }, white));
     entities.emplace("rightPaddle", std::make_unique<Paddle>("rightPaddle", (LC_Rect){ 800 - (25 + Paddle::PADDLE_WIDTH),
         300 - Paddle::PADDLE_HEIGHT / 2, Paddle::PADDLE_WIDTH, Paddle::PADDLE_HEIGHT }, white));
+
+    // Setup Ball
+    entities.emplace("Ball", std::make_unique<Ball>("Ball", (LC_Rect){ 400 - Ball::BALL_LENGTH / 2, 300 - Ball::BALL_LENGTH / 2,
+        Ball::BALL_LENGTH , Ball::BALL_LENGTH}, white));
 }
 
 SDL_AppResult Game::ProcessInput(const SDL_Event *event) {
@@ -65,6 +72,10 @@ SDL_AppResult Game::ProcessInput(const SDL_Event *event) {
         LC_GL_FramebufferSizeCallback(screenWidth, screenHeight);
     }
 
+    if (event->type == SDL_EVENT_KEY_DOWN && event->key.key == SDLK_SPACE) {
+        state = GAME_ACTIVE;
+    }
+
     entities["leftPaddle"]->ProcessInput(event);
     entities["rightPaddle"]->ProcessInput(event);
 
@@ -74,6 +85,10 @@ SDL_AppResult Game::ProcessInput(const SDL_Event *event) {
 void Game::Update(const double deltaTime) {
     entities["leftPaddle"]->Update(deltaTime, screenHeight);
     entities["rightPaddle"]->Update(deltaTime, screenHeight);
+
+    if (state == GAME_ACTIVE) {
+        entities["Ball"]->Update(deltaTime, screenHeight);
+    }
 }
 
 void Game::Render() {

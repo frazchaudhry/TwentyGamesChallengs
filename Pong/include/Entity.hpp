@@ -10,9 +10,9 @@ extern "C" {
 class Entity {
 public:
     std::string id;
-    LC_Rect transform;
-    vec2 velocity;
-    LC_Color color;
+    LC_Rect transform{};
+    vec2 velocity{};
+    LC_Color color{};
 
     Entity() = default;
     Entity(std::string id, LC_Rect pos, LC_Color color);
@@ -26,8 +26,8 @@ public:
 
 class Wall final : public Entity {
 public: 
-    bool isVisible;
-    static const int32 HEIGHT { 25 };
+    bool isVisible{};
+    static constexpr int32 HEIGHT { 25 };
 
     Wall() = default;
     Wall(std::string id, LC_Rect pos, LC_Color color, bool isVisible);
@@ -44,15 +44,8 @@ public:
 
 class Paddle final : public Entity {
 public:
-    enum PaddleState {
-        STOP,
-        UP,
-        DOWN
-    };
-    PaddleState state { STOP };
-    static const int32 PADDLE_WIDTH { 10 };
-    static const int32 PADDLE_HEIGHT { 50 };
-    static const int32 PADDLE_VELOCITY { 300 };
+    static constexpr int32 PADDLE_WIDTH { 10 };
+    static constexpr int32 PADDLE_HEIGHT { 50 };
 
     Paddle() = default;
     Paddle(std::string id, LC_Rect pos, LC_Color color);
@@ -60,6 +53,26 @@ public:
     void ProcessInput(const SDL_Event *event) override;
     void Update(double deltaTime, int32 screenHeight) override;
 private:
+    enum PaddleState {
+        PADDLE_STOP,
+        PADDLE_UP,
+        PADDLE_DOWN
+    };
+    PaddleState state { PADDLE_STOP };
+    static constexpr int32 PADDLE_VELOCITY { 300 };
+};
+
+class Ball final : public Entity {
+public:
+    static constexpr int32 BALL_LENGTH { 10 };
+    const float STARTING_SPEED { 300 };
+    float currentSpeed { STARTING_SPEED };
+    vec2 direction { 1.0f, 0.0f };
+
+    Ball() = default;
+    Ball(std::string id, LC_Rect pos, LC_Color color);
+
+    void Update(double deltaTime, int32 screenHeight) override;
 };
 
 #endif // ENTITY_HPP
