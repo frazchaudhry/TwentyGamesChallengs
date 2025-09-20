@@ -1,7 +1,4 @@
 #include "Entity.hpp"
-#include <SDL3/SDL_events.h>
-#include <SDL3/SDL_keycode.h>
-#include <vec2.h>
 
 Entity::Entity(std::string id, const LC_Rect pos, const LC_Color color) : id(std::move(id)), transform(pos), velocity{ 0.0f, 0.0f }, color(color) {
 }

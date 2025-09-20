@@ -45,4 +45,4 @@ target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/i
 target_compile_options(${PROJECT_NAME} PRIVATE -ggdb -Wall -Wextra -Wconversion -Wsign-conversion -Wfatal-errors
     -Wunused-variable -Wsuggest-attribute=const)
 
-target_link_libraries(${PROJECT_NAME} PRIVATE LibraC ${CMAKE_CURRENT_SOURCE_DIR}/../libs/LibraC/build/external/GLAD/libglad.a -lSDL3)
+target_link_libraries(${PROJECT_NAME} PRIVATE LibraC ${CMAKE_CURRENT_SOURCE_DIR}/../libs/LibraC/build/external/GLAD/libglad.a -lSDL3 -lm)
