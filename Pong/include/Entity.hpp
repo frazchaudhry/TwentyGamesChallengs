@@ -10,9 +10,10 @@ extern "C" {
 class Entity {
 public:
     std::string id;
-    LC_Rect transform{};
-    vec2 velocity{};
-    LC_Color color{};
+    LC_Rect transform{ 0, 0, 1, 1 };
+    vec2 velocity{ 0 };
+    vec2 acceleration { 0 };
+    LC_Color color{ .r = 255, .g = 255, .b = 255, .a = 1.0f };
 
     Entity() = default;
     Entity(std::string id, LC_Rect pos, LC_Color color);
@@ -26,7 +27,7 @@ public:
 
 class Wall final : public Entity {
 public: 
-    bool isVisible{};
+    bool isVisible{ false };
     static constexpr int32 HEIGHT { 25 };
 
     Wall() = default;
@@ -65,9 +66,7 @@ private:
 class Ball final : public Entity {
 public:
     static constexpr int32 BALL_LENGTH { 10 };
-    const float STARTING_SPEED { 300 };
-    float currentSpeed { STARTING_SPEED };
-    vec2 direction { 1.0f, 0.0f };
+    float currentSpeed { 300 };
 
     Ball() = default;
     Ball(std::string id, LC_Rect pos, LC_Color color);
