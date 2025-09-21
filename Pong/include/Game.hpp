@@ -1,7 +1,7 @@
 #ifndef GAME_HPP
 #define GAME_HPP
 
-#include <map>
+#include <unordered_map>
 #include <memory>
 #include <string>
 
@@ -36,7 +36,7 @@ private:
     std::string fontFilePath;
     LC_Arena *arena;
     LC_GL_Renderer *renderer;
-    std::map<std::string, std::unique_ptr<Entity>> entities;
+    std::unordered_map<std::string, std::unique_ptr<Entity>> entities;
     int32 player1Score { 0 };
     int32 player2Score { 0 };
     GameState state { GAME_START };
