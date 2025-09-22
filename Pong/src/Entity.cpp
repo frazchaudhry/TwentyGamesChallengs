@@ -1,6 +1,14 @@
 #include "Entity.hpp"
 
-Entity::Entity(std::string id, const LC_Rect pos, const LC_Color color) : id(std::move(id)), transform(pos), velocity{ 0.0f, 0.0f }, color(color) {
+Entity::Entity(const std::string &id, const LC_Rect &pos, const LC_Color &color) : id(id), velocity{ 0.0f, 0.0f } {
+    transform.x = pos.x;
+    transform.y = pos.y;
+    transform.w = pos.w;
+    transform.h = pos.h;
+    this->color.r = color.r;
+    this->color.g = color.g;
+    this->color.b = color.b;
+    this->color.a = color.a;
 }
 
 void Entity::ProcessInput([[maybe_unused]]const SDL_Event *event) {}
@@ -11,7 +19,7 @@ void Entity::Render(LC_GL_Renderer *renderer) {
     LC_GL_RenderRectangle(renderer, &transform, &color, false);
 }
 
-Wall::Wall(std::string id, const LC_Rect pos, const LC_Color color, const bool isVisible) : Entity(std::move(id) ,pos, color), isVisible(isVisible) {
+Wall::Wall(const std::string &id, const LC_Rect &pos, const LC_Color &color, const bool isVisible) : Entity(id ,pos, color), isVisible(isVisible) {
 
 }
 
@@ -21,14 +29,14 @@ void Wall::Render(LC_GL_Renderer *renderer) {
     this->Entity::Render(renderer);
 }
 
-Divider::Divider(std::string id, const LC_Rect pos, const LC_Color color) : Entity(std::move(id), pos, color) {
+Divider::Divider(const std::string &id, const LC_Rect &pos, const LC_Color &color) : Entity(id, pos, color) {
 }
 
 void Divider::Render(LC_GL_Renderer *renderer) {
     LC_GL_RenderRectangle(renderer, &transform, &color, true);
 }
 
-Paddle::Paddle(std::string id, const LC_Rect pos, const LC_Color color) : Entity(std::move(id), pos, color) {}
+Paddle::Paddle(const std::string &id, const LC_Rect &pos, const LC_Color &color) : Entity(id, pos, color) {}
 
 void Paddle::ProcessInput(const SDL_Event *event) {
     if (id == "leftPaddle") {
@@ -58,7 +66,7 @@ void Paddle::Update(const double deltaTime, const int32 screenHeight) {
     }
 }
 
-Ball::Ball(std::string id, const LC_Rect pos, const LC_Color color) : Entity(std::move(id), pos, color) {
+Ball::Ball(const std::string &id, const LC_Rect &pos, const LC_Color &color) : Entity(id, pos, color) {
     velocity[0] = 1.0f;
 }
 

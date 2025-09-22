@@ -16,7 +16,7 @@ public:
     LC_Color color{ .r = 255, .g = 255, .b = 255, .a = 1.0f };
 
     Entity() = default;
-    Entity(std::string id, LC_Rect pos, LC_Color color);
+    Entity(const std::string &id, const LC_Rect &pos, const LC_Color &color);
 
     virtual ~Entity() = default;
 
@@ -31,7 +31,7 @@ public:
     static constexpr int32 HEIGHT { 25 };
 
     Wall() = default;
-    Wall(std::string id, LC_Rect pos, LC_Color color, bool isVisible);
+    Wall(const std::string &id, const LC_Rect &pos, const LC_Color &color, bool isVisible);
 
     void Render(LC_GL_Renderer *renderer) override;
 };
@@ -39,7 +39,7 @@ public:
 class Divider final : public Entity {
 public:
     Divider() = default;
-    Divider(std::string id, LC_Rect pos, LC_Color color);
+    Divider(const std::string &id, const LC_Rect &pos, const LC_Color &color);
     void Render(LC_GL_Renderer *renderer) override;
 };
 
@@ -49,7 +49,7 @@ public:
     static constexpr int32 PADDLE_HEIGHT { 50 };
 
     Paddle() = default;
-    Paddle(std::string id, LC_Rect pos, LC_Color color);
+    Paddle(const std::string &id, const LC_Rect &pos, const LC_Color &color);
 
     void ProcessInput(const SDL_Event *event) override;
     void Update(double deltaTime, int32 screenHeight) override;
@@ -69,7 +69,7 @@ public:
     float currentSpeed { 300 };
 
     Ball() = default;
-    Ball(std::string id, LC_Rect pos, LC_Color color);
+    Ball(const std::string &id, const LC_Rect &pos, const LC_Color &color);
 
     void Update(double deltaTime, int32 screenHeight) override;
 };

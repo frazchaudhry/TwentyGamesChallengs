@@ -1,8 +1,5 @@
 #include "Game.hpp"
-#include <SDL3/SDL_events.h>
-#include <SDL3/SDL_keycode.h>
 #include <cstdlib>
-#include <libraVideo.h>
 #include <memory>
 
 bool Game::Init(const int32 width, const int32 height) {
