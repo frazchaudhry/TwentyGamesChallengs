@@ -54,12 +54,12 @@ public:
     void ProcessInput(const SDL_Event *event) override;
     void Update(double deltaTime, int32 screenHeight) override;
 private:
-    enum PaddleState {
-        PADDLE_STOP,
-        PADDLE_UP,
-        PADDLE_DOWN
+    enum class PaddleState {
+        STOP,
+        UP,
+        DOWN
     };
-    PaddleState state { PADDLE_STOP };
+    PaddleState state { PaddleState::STOP };
     static constexpr int32 PADDLE_VELOCITY { 300 };
 };
 

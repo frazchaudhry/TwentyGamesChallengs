@@ -41,27 +41,27 @@ Paddle::Paddle(const std::string &id, const LC_Rect &pos, const LC_Color &color)
 void Paddle::ProcessInput(const SDL_Event *event) {
     if (id == "leftPaddle") {
         if (event->key.key == SDLK_W && event->type == SDL_EVENT_KEY_DOWN) {
-            state = PADDLE_UP;
+            state = PaddleState::UP;
         } else if (event->type == SDL_EVENT_KEY_UP && (event->key.key == SDLK_W || event->key.key == SDLK_S)) {
-            state = PADDLE_STOP;
+            state = PaddleState::STOP;
         } else if (event->key.key == SDLK_S && event->type == SDL_EVENT_KEY_DOWN) {
-            state = PADDLE_DOWN;
+            state = PaddleState::DOWN;
         } 
     } else if (id == "rightPaddle") {
         if (event->key.key == SDLK_UP && event->type == SDL_EVENT_KEY_DOWN) {
-            state = PADDLE_UP;
+            state = PaddleState::UP;
         } else if (event->type == SDL_EVENT_KEY_UP && (event->key.key == SDLK_UP || event->key.key == SDLK_DOWN)) {
-            state = PADDLE_STOP;
+            state = PaddleState::STOP;
         } else if (event->key.key == SDLK_DOWN && event->type == SDL_EVENT_KEY_DOWN) {
-            state = PADDLE_DOWN;
+            state = PaddleState::DOWN;
         }
     }
 }
 
 void Paddle::Update(const double deltaTime, const int32 screenHeight) {
-    if (state == PADDLE_UP && transform.y >= Wall::HEIGHT) {
+    if (state == PaddleState::UP && transform.y >= Wall::HEIGHT) {
         transform.y -= static_cast<int32>(static_cast<float>(PADDLE_VELOCITY) * deltaTime);
-    } else if (state == PADDLE_DOWN && transform.y <= screenHeight - (PADDLE_HEIGHT + Wall::HEIGHT)) {
+    } else if (state == PaddleState::DOWN && transform.y <= screenHeight - (PADDLE_HEIGHT + Wall::HEIGHT)) {
         transform.y += static_cast<int32>(static_cast<float>(PADDLE_VELOCITY) * deltaTime);
     }
 }
