@@ -37,27 +37,30 @@ void Game::Setup() {
     const LC_Color white = LC_Color_Create(255.0f, 255.0f, 255.0f, 1.0f);
 
     // Setup Walls
-    entities.emplace("top", std::make_unique<Wall>("top", (LC_FRect){0, 0, (float)screenWidth, 25}, white, true));
-    entities.emplace("bottom", std::make_unique<Wall>("bottom", (LC_FRect){0, (float)screenHeight - 25, (float)screenWidth, 25}, white, true));
+    entities.emplace("top", std::make_unique<Wall>("top", (LC_FRect){0, 0, static_cast<float>(screenWidth), 25},
+        white, true));
+    entities.emplace("bottom", std::make_unique<Wall>("bottom", (LC_FRect){0, static_cast<float>(screenHeight) - 25,
+        static_cast<float>(screenWidth), 25}, white, true));
 
     // Setup Divider
     for (int32 i = 0, y = 40; y < 560; i++, y += 30) {
         Divider divider;
         divider.id = "divider-" + std::to_string(i+1);
-        divider.transform = { 400 - 5 / (float)2, (float)y, 5, 20 };
+        divider.transform = { 400 - 5 / static_cast<float>(2), static_cast<float>(y), 5, 20 };
         divider.color = LC_Color_Create(255.0f, 255.0f, 255.0f, 0.3f);
 
         entities.emplace(divider.id, std::make_unique<Divider>(divider.id, divider.transform, divider.color));
     }
 
     // Setup Paddles
-    entities.emplace("leftPaddle", std::make_unique<Paddle>("leftPaddle", (LC_FRect){ 25, 300 - Paddle::PADDLE_HEIGHT / (float)2,
-        Paddle::PADDLE_WIDTH, Paddle::PADDLE_HEIGHT }, white));
+    entities.emplace("leftPaddle", std::make_unique<Paddle>("leftPaddle", (LC_FRect){ 25,
+        300 - Paddle::PADDLE_HEIGHT / static_cast<float>(2), Paddle::PADDLE_WIDTH, Paddle::PADDLE_HEIGHT }, white));
     entities.emplace("rightPaddle", std::make_unique<Paddle>("rightPaddle", (LC_FRect){ 800 - (25 + Paddle::PADDLE_WIDTH),
-        300 - Paddle::PADDLE_HEIGHT / (float)2, Paddle::PADDLE_WIDTH, Paddle::PADDLE_HEIGHT }, white));
+        300 - Paddle::PADDLE_HEIGHT / static_cast<float>(2), Paddle::PADDLE_WIDTH, Paddle::PADDLE_HEIGHT }, white));
 
     // Setup Ball
-    entities.emplace("Ball", std::make_unique<Ball>("Ball", (LC_FRect){ 400 - Ball::BALL_LENGTH / (float)2, 300 - Ball::BALL_LENGTH / (float)2,
+    entities.emplace("Ball", std::make_unique<Ball>("Ball", (LC_FRect){ 400 - Ball::BALL_LENGTH / static_cast<float>(2),
+        300 - Ball::BALL_LENGTH / static_cast<float>(2),
         Ball::BALL_LENGTH , Ball::BALL_LENGTH}, white));
 }
 
@@ -83,12 +86,11 @@ SDL_AppResult Game::ProcessInput(const SDL_Event *event) {
 }
 
 void Game::Update(const double deltaTime) {
-    auto leftPaddle = (Paddle*)entities["leftPaddle"].get();
-    auto rightPaddle = (Paddle*)entities["rightPaddle"].get();
-    auto topWall = (Wall*)entities["top"].get();
-    auto bottomWall = (Wall*)entities["bottom"].get();
-    auto ball = (Ball*)entities["Ball"].get();
-
+    const auto leftPaddle = static_cast<Paddle*>(entities["leftPaddle"].get());
+    const auto rightPaddle = static_cast<Paddle*>(entities["rightPaddle"].get());
+    const auto topWall = static_cast<Wall*>(entities["top"].get());
+    const auto bottomWall = static_cast<Wall*>(entities["bottom"].get());
+    const auto ball = static_cast<Ball*>(entities["Ball"].get());
 
     leftPaddle->Update(deltaTime, screenHeight);
     rightPaddle->Update(deltaTime, screenHeight);
@@ -141,9 +143,9 @@ void Game::Unload() const {
 }
 
 void Game::HandleCollisions(Ball &ball, const Paddle &leftPaddle, const Paddle &rightPaddle, const Wall &topWall,
-                            const Wall &bottomWall) {
+                            const Wall &bottomWall) const {
     bool isCollided = false;
-    if (ball.transform.x > (float)screenWidth / 2) {
+    if (ball.transform.x > static_cast<float>(screenWidth) / 2) {
         isCollided = LC_FRect_CheckCollisionAABB(&ball.transform, &rightPaddle.transform);
         if (isCollided) {
             ball.velocity[0] *= -1;
@@ -158,7 +160,7 @@ void Game::HandleCollisions(Ball &ball, const Paddle &leftPaddle, const Paddle &
             glm_vec2_normalize(ball.velocity);
         }
     }
-    if (ball.transform.y > (float)screenHeight / 2) {
+    if (ball.transform.y > static_cast<float>(screenHeight) / 2) {
         isCollided = LC_FRect_CheckCollisionAABB(&ball.transform, &bottomWall.transform);
         if (isCollided) {
             ball.velocity[1] *= -1;

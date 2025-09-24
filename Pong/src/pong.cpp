@@ -26,8 +26,8 @@ SDL_AppResult SDL_AppEvent([[maybe_unused]]void *appstate, SDL_Event *event) {
 
 SDL_AppResult SDL_AppIterate([[maybe_unused]]void *appstate) {
     // Update
-    uint64 currentFrame = SDL_GetPerformanceCounter();
-    deltaTime = static_cast<double>(static_cast<double>(currentFrame - lastFrame) / static_cast<double>(SDL_GetPerformanceFrequency()));
+    const uint64 currentFrame = SDL_GetPerformanceCounter();
+    deltaTime = static_cast<double>(currentFrame - lastFrame) / static_cast<double>(SDL_GetPerformanceFrequency());
     lastFrame = currentFrame;
     breakout->Update(deltaTime);
 

@@ -59,10 +59,12 @@ void Paddle::ProcessInput(const SDL_Event *event) {
 }
 
 void Paddle::Update(const double deltaTime, const int32 screenHeight) {
+    const auto deltaTimeF = static_cast<float>(deltaTime);
+    constexpr auto paddleVelocity = static_cast<float>(PADDLE_VELOCITY);
     if (state == PaddleState::UP && transform.y >= Wall::HEIGHT) {
-        transform.y -= static_cast<float>(PADDLE_VELOCITY) * static_cast<float>(deltaTime);
-    } else if (state == PaddleState::DOWN && transform.y <= (float)screenHeight - (PADDLE_HEIGHT + Wall::HEIGHT)) {
-        transform.y += static_cast<float>(PADDLE_VELOCITY) * static_cast<float>(deltaTime);
+        transform.y -= paddleVelocity * deltaTimeF;
+    } else if (state == PaddleState::DOWN && transform.y <= static_cast<float>(screenHeight) - (PADDLE_HEIGHT + Wall::HEIGHT)) {
+        transform.y += paddleVelocity * deltaTimeF;
     }
 }
 
@@ -72,7 +74,7 @@ Ball::Ball(const std::string &id, const LC_FRect &pos, const LC_Color &color) : 
 
 void Ball::Update(const double deltaTime, [[maybe_unused]]const int32 screenHeight) {
     const float currentSpeed = speed * static_cast<float>(deltaTime);
-    vec2 currentPos = { static_cast<float>(transform.x), static_cast<float>(transform.y) };
+    vec2 currentPos = { transform.x, transform.y };
     glm_vec2_muladds(velocity, currentSpeed, currentPos);
     transform.x = currentPos[0];
     transform.y = currentPos[1];
