@@ -70,7 +70,7 @@ SDL_AppResult Game::ProcessInput(const SDL_Event *event) {
     }
 
     if (event->type == SDL_EVENT_KEY_DOWN && event->key.key == SDLK_SPACE) {
-        state = GAME_ACTIVE;
+        state = GameState::ACTIVE;
     }
 
     entities["leftPaddle"]->ProcessInput(event);
@@ -83,7 +83,7 @@ void Game::Update(const double deltaTime) {
     entities["leftPaddle"]->Update(deltaTime, screenHeight);
     entities["rightPaddle"]->Update(deltaTime, screenHeight);
 
-    if (state == GAME_ACTIVE) {
+    if (state == GameState::ACTIVE) {
         entities["Ball"]->Update(deltaTime, screenHeight);
     }
 }
