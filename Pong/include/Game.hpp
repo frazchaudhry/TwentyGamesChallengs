@@ -42,6 +42,8 @@ private:
     GameState state { GameState::START };
 
     void RenderScore(int32 score, const vec3 pos) const;
+    void HandleCollisions(Ball &ball, const Paddle &leftPaddle, const Paddle &rightPaddle, const Wall &topWall,
+                          const Wall &bottomWall);
 };
 
 #endif // GAME_HPP

@@ -1,6 +1,9 @@
 #include "Game.hpp"
+#include <SDL3/SDL_log.h>
 #include <cstdlib>
+#include <libraVideo.h>
 #include <memory>
+#include <vec2.h>
 
 bool Game::Init(const int32 width, const int32 height) {
     backingBuffer = malloc(100 * 1024);
@@ -34,27 +37,27 @@ void Game::Setup() {
     const LC_Color white = LC_Color_Create(255.0f, 255.0f, 255.0f, 1.0f);
 
     // Setup Walls
-    entities.emplace("top", std::make_unique<Wall>("top", (LC_Rect){0, 0, screenWidth, 25}, white, true));
-    entities.emplace("bottom", std::make_unique<Wall>("bottom", (LC_Rect){0, screenHeight - 25, screenWidth, 25}, white, true));
+    entities.emplace("top", std::make_unique<Wall>("top", (LC_FRect){0, 0, (float)screenWidth, 25}, white, true));
+    entities.emplace("bottom", std::make_unique<Wall>("bottom", (LC_FRect){0, (float)screenHeight - 25, (float)screenWidth, 25}, white, true));
 
     // Setup Divider
     for (int32 i = 0, y = 40; y < 560; i++, y += 30) {
         Divider divider;
         divider.id = "divider-" + std::to_string(i+1);
-        divider.transform = { 400 - 5 / 2, y, 5, 20 };
+        divider.transform = { 400 - 5 / (float)2, (float)y, 5, 20 };
         divider.color = LC_Color_Create(255.0f, 255.0f, 255.0f, 0.3f);
 
         entities.emplace(divider.id, std::make_unique<Divider>(divider.id, divider.transform, divider.color));
     }
 
     // Setup Paddles
-    entities.emplace("leftPaddle", std::make_unique<Paddle>("leftPaddle", (LC_Rect){ 25, 300 - Paddle::PADDLE_HEIGHT / 2,
+    entities.emplace("leftPaddle", std::make_unique<Paddle>("leftPaddle", (LC_FRect){ 25, 300 - Paddle::PADDLE_HEIGHT / (float)2,
         Paddle::PADDLE_WIDTH, Paddle::PADDLE_HEIGHT }, white));
-    entities.emplace("rightPaddle", std::make_unique<Paddle>("rightPaddle", (LC_Rect){ 800 - (25 + Paddle::PADDLE_WIDTH),
-        300 - Paddle::PADDLE_HEIGHT / 2, Paddle::PADDLE_WIDTH, Paddle::PADDLE_HEIGHT }, white));
+    entities.emplace("rightPaddle", std::make_unique<Paddle>("rightPaddle", (LC_FRect){ 800 - (25 + Paddle::PADDLE_WIDTH),
+        300 - Paddle::PADDLE_HEIGHT / (float)2, Paddle::PADDLE_WIDTH, Paddle::PADDLE_HEIGHT }, white));
 
     // Setup Ball
-    entities.emplace("Ball", std::make_unique<Ball>("Ball", (LC_Rect){ 400 - Ball::BALL_LENGTH / 2, 300 - Ball::BALL_LENGTH / 2,
+    entities.emplace("Ball", std::make_unique<Ball>("Ball", (LC_FRect){ 400 - Ball::BALL_LENGTH / (float)2, 300 - Ball::BALL_LENGTH / (float)2,
         Ball::BALL_LENGTH , Ball::BALL_LENGTH}, white));
 }
 
@@ -80,11 +83,19 @@ SDL_AppResult Game::ProcessInput(const SDL_Event *event) {
 }
 
 void Game::Update(const double deltaTime) {
-    entities["leftPaddle"]->Update(deltaTime, screenHeight);
-    entities["rightPaddle"]->Update(deltaTime, screenHeight);
+    auto leftPaddle = (Paddle*)entities["leftPaddle"].get();
+    auto rightPaddle = (Paddle*)entities["rightPaddle"].get();
+    auto topWall = (Wall*)entities["top"].get();
+    auto bottomWall = (Wall*)entities["bottom"].get();
+    auto ball = (Ball*)entities["Ball"].get();
+
+
+    leftPaddle->Update(deltaTime, screenHeight);
+    rightPaddle->Update(deltaTime, screenHeight);
 
     if (state == GameState::ACTIVE) {
-        entities["Ball"]->Update(deltaTime, screenHeight);
+        HandleCollisions(*ball, *leftPaddle, *rightPaddle, *topWall, *bottomWall);
+        ball->Update(deltaTime, screenHeight);
     }
 }
 
@@ -129,3 +140,37 @@ void Game::Unload() const {
     free(backingBuffer);
 }
 
+void Game::HandleCollisions(Ball &ball, const Paddle &leftPaddle, const Paddle &rightPaddle, const Wall &topWall,
+                            const Wall &bottomWall) {
+    bool isCollided = false;
+    if (ball.transform.x > (float)screenWidth / 2) {
+        isCollided = LC_FRect_CheckCollisionAABB(&ball.transform, &rightPaddle.transform);
+        if (isCollided) {
+            ball.velocity[0] *= -1;
+            ball.transform.x = rightPaddle.transform.x - ball.transform.w;
+            glm_vec2_normalize(ball.velocity);
+        }
+    } else {
+        isCollided = LC_FRect_CheckCollisionAABB(&ball.transform, &leftPaddle.transform);
+        if (isCollided) {
+            ball.velocity[0] *= -1;
+            ball.transform.x = leftPaddle.transform.x + leftPaddle.transform.w + 1;
+            glm_vec2_normalize(ball.velocity);
+        }
+    }
+    if (ball.transform.y > (float)screenHeight / 2) {
+        isCollided = LC_FRect_CheckCollisionAABB(&ball.transform, &bottomWall.transform);
+        if (isCollided) {
+            ball.velocity[1] *= -1;
+            ball.transform.y = bottomWall.transform.y - ball.transform.h;
+            glm_vec2_normalize(ball.velocity);
+        }
+    } else {
+        isCollided = LC_FRect_CheckCollisionAABB(&ball.transform, &topWall.transform);
+        if (isCollided) {
+            ball.velocity[1] *= -1;
+            ball.transform.y = topWall.transform.h;
+            glm_vec2_normalize(ball.velocity);
+        }
+    }
+}

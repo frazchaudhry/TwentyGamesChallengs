@@ -1,6 +1,6 @@
 #include "Entity.hpp"
 
-Entity::Entity(const std::string &id, const LC_Rect &pos, const LC_Color &color) : id(id), velocity{ 0.0f, 0.0f } {
+Entity::Entity(const std::string &id, const LC_FRect &pos, const LC_Color &color) : id(id), velocity{ 0.0f, 0.0f } {
     transform.x = pos.x;
     transform.y = pos.y;
     transform.w = pos.w;
@@ -19,7 +19,7 @@ void Entity::Render(LC_GL_Renderer *renderer) {
     LC_GL_RenderRectangle(renderer, &transform, &color, false);
 }
 
-Wall::Wall(const std::string &id, const LC_Rect &pos, const LC_Color &color, const bool isVisible) : Entity(id ,pos, color), isVisible(isVisible) {
+Wall::Wall(const std::string &id, const LC_FRect &pos, const LC_Color &color, const bool isVisible) : Entity(id ,pos, color), isVisible(isVisible) {
 
 }
 
@@ -29,14 +29,14 @@ void Wall::Render(LC_GL_Renderer *renderer) {
     this->Entity::Render(renderer);
 }
 
-Divider::Divider(const std::string &id, const LC_Rect &pos, const LC_Color &color) : Entity(id, pos, color) {
+Divider::Divider(const std::string &id, const LC_FRect &pos, const LC_Color &color) : Entity(id, pos, color) {
 }
 
 void Divider::Render(LC_GL_Renderer *renderer) {
     LC_GL_RenderRectangle(renderer, &transform, &color, true);
 }
 
-Paddle::Paddle(const std::string &id, const LC_Rect &pos, const LC_Color &color) : Entity(id, pos, color) {}
+Paddle::Paddle(const std::string &id, const LC_FRect &pos, const LC_Color &color) : Entity(id, pos, color) {}
 
 void Paddle::ProcessInput(const SDL_Event *event) {
     if (id == "leftPaddle") {
@@ -60,20 +60,21 @@ void Paddle::ProcessInput(const SDL_Event *event) {
 
 void Paddle::Update(const double deltaTime, const int32 screenHeight) {
     if (state == PaddleState::UP && transform.y >= Wall::HEIGHT) {
-        transform.y -= static_cast<int32>(static_cast<float>(PADDLE_VELOCITY) * deltaTime);
-    } else if (state == PaddleState::DOWN && transform.y <= screenHeight - (PADDLE_HEIGHT + Wall::HEIGHT)) {
-        transform.y += static_cast<int32>(static_cast<float>(PADDLE_VELOCITY) * deltaTime);
+        transform.y -= static_cast<float>(PADDLE_VELOCITY) * static_cast<float>(deltaTime);
+    } else if (state == PaddleState::DOWN && transform.y <= (float)screenHeight - (PADDLE_HEIGHT + Wall::HEIGHT)) {
+        transform.y += static_cast<float>(PADDLE_VELOCITY) * static_cast<float>(deltaTime);
     }
 }
 
-Ball::Ball(const std::string &id, const LC_Rect &pos, const LC_Color &color) : Entity(id, pos, color) {
+Ball::Ball(const std::string &id, const LC_FRect &pos, const LC_Color &color) : Entity(id, pos, color) {
     velocity[0] = 1.0f;
 }
 
 void Ball::Update(const double deltaTime, [[maybe_unused]]const int32 screenHeight) {
-    const float speed = currentSpeed * static_cast<float>(deltaTime);
+    const float currentSpeed = speed * static_cast<float>(deltaTime);
     vec2 currentPos = { static_cast<float>(transform.x), static_cast<float>(transform.y) };
-    glm_vec2_muladds(velocity, speed, currentPos);
-    transform.x = static_cast<int32>(currentPos[0]);
-    transform.y = static_cast<int32>(currentPos[1]);
+    glm_vec2_muladds(velocity, currentSpeed, currentPos);
+    transform.x = currentPos[0];
+    transform.y = currentPos[1];
 }
+
