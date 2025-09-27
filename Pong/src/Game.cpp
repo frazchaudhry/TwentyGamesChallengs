@@ -1,9 +1,7 @@
 #include "Game.hpp"
-#include <SDL3/SDL_log.h>
+#include <SDL3/SDL_keycode.h>
 #include <cstdlib>
-#include <libraVideo.h>
 #include <memory>
-#include <vec2.h>
 
 bool Game::Init(const int32 width, const int32 height) {
     backingBuffer = malloc(100 * 1024);
@@ -53,15 +51,11 @@ void Game::Setup() {
     }
 
     // Setup Paddles
-    entities.emplace("leftPaddle", std::make_unique<Paddle>("leftPaddle", (LC_FRect){ 25,
-        300 - Paddle::PADDLE_HEIGHT / static_cast<float>(2), Paddle::PADDLE_WIDTH, Paddle::PADDLE_HEIGHT }, white));
-    entities.emplace("rightPaddle", std::make_unique<Paddle>("rightPaddle", (LC_FRect){ 800 - (25 + Paddle::PADDLE_WIDTH),
-        300 - Paddle::PADDLE_HEIGHT / static_cast<float>(2), Paddle::PADDLE_WIDTH, Paddle::PADDLE_HEIGHT }, white));
+    entities.emplace("leftPaddle", std::make_unique<Paddle>("leftPaddle", LEFT_PADDLE_STARTING_POS, white));
+    entities.emplace("rightPaddle", std::make_unique<Paddle>("rightPaddle", RIGHT_PADDLE_STARTING_POS, white));
 
     // Setup Ball
-    entities.emplace("Ball", std::make_unique<Ball>("Ball", (LC_FRect){ 400 - Ball::BALL_LENGTH / static_cast<float>(2),
-        300 - Ball::BALL_LENGTH / static_cast<float>(2),
-        Ball::BALL_LENGTH , Ball::BALL_LENGTH}, white));
+    entities.emplace("Ball", std::make_unique<Ball>("Ball", BALL_STARTING_POS, white));
 }
 
 SDL_AppResult Game::ProcessInput(const SDL_Event *event) {
@@ -75,8 +69,15 @@ SDL_AppResult Game::ProcessInput(const SDL_Event *event) {
         LC_GL_FramebufferSizeCallback(screenWidth, screenHeight);
     }
 
-    if (event->type == SDL_EVENT_KEY_DOWN && event->key.key == SDLK_SPACE) {
-        state = GameState::ACTIVE;
+    if (event->type == SDL_EVENT_KEY_DOWN) {
+        switch(event->key.key) {
+            case SDLK_SPACE:
+                state = GameState::ACTIVE;
+                break;
+            case SDLK_RETURN:
+                ResetGame();
+                break;
+        }
     }
 
     entities["leftPaddle"]->ProcessInput(event);
@@ -98,6 +99,13 @@ void Game::Update(const double deltaTime) {
     if (state == GameState::ACTIVE) {
         HandleCollisions(*ball, *leftPaddle, *rightPaddle, *topWall, *bottomWall);
         ball->Update(deltaTime, screenHeight);
+        if (static_cast<int32>(ball->transform.x) > screenWidth) {
+            player1Score++;
+            ResetGame();
+        } else if (static_cast<int32>(ball->transform.x < 0.0f)) {
+            player2Score++;
+            ResetGame();
+        }
     }
 }
 
@@ -184,4 +192,11 @@ void Game::CalculateBallDirection(Ball &ball, const Paddle &paddle) const {
     float strength = 2.0f;
     ball.velocity[1] = percentage * strength;
     ball.velocity[0] *= -1;
+}
+
+void Game::ResetGame() {
+    entities["leftPaddle"]->transform = LEFT_PADDLE_STARTING_POS;
+    entities["rightPaddle"]->transform = RIGHT_PADDLE_STARTING_POS;
+    entities["Ball"]->transform = BALL_STARTING_POS;
+    state = GameState::START;
 }
