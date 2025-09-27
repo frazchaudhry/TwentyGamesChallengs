@@ -44,6 +44,7 @@ private:
     void RenderScore(int32 score, const vec3 pos) const;
     void HandleCollisions(Ball &ball, const Paddle &leftPaddle, const Paddle &rightPaddle, const Wall &topWall,
                           const Wall &bottomWall) const;
+    void CalculateBallDirection(Ball &ball, const Paddle &paddle) const;
 };
 
 #endif // GAME_HPP

@@ -148,14 +148,14 @@ void Game::HandleCollisions(Ball &ball, const Paddle &leftPaddle, const Paddle &
     if (ball.transform.x > static_cast<float>(screenWidth) / 2) {
         isCollided = LC_FRect_CheckCollisionAABB(&ball.transform, &rightPaddle.transform);
         if (isCollided) {
-            ball.velocity[0] *= -1;
+            CalculateBallDirection(ball, rightPaddle);
             ball.transform.x = rightPaddle.transform.x - ball.transform.w;
             glm_vec2_normalize(ball.velocity);
         }
     } else {
         isCollided = LC_FRect_CheckCollisionAABB(&ball.transform, &leftPaddle.transform);
         if (isCollided) {
-            ball.velocity[0] *= -1;
+            CalculateBallDirection(ball, leftPaddle);
             ball.transform.x = leftPaddle.transform.x + leftPaddle.transform.w + 1;
             glm_vec2_normalize(ball.velocity);
         }
@@ -175,4 +175,13 @@ void Game::HandleCollisions(Ball &ball, const Paddle &leftPaddle, const Paddle &
             glm_vec2_normalize(ball.velocity);
         }
     }
+}
+
+void Game::CalculateBallDirection(Ball &ball, const Paddle &paddle) const {
+    float centerPaddle = paddle.transform.y + paddle.transform.h / 2.0f;
+    float distance = (ball.transform.y + ball.transform.h / 2.0f) - centerPaddle;
+    float percentage = distance / (paddle.transform.h / 2.0f);
+    float strength = 2.0f;
+    ball.velocity[1] = percentage * strength;
+    ball.velocity[0] *= -1;
 }
