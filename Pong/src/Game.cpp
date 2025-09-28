@@ -35,15 +35,17 @@ void Game::Setup() {
     const LC_Color white = LC_Color_Create(255.0f, 255.0f, 255.0f, 1.0f);
 
     // Setup Walls
-    entities.emplace("top", std::make_unique<Wall>("top", (LC_FRect){0, 0, static_cast<float>(screenWidth), 25},
-        white, true));
-    entities.emplace("bottom", std::make_unique<Wall>("bottom", (LC_FRect){0, static_cast<float>(screenHeight) - 25,
-        static_cast<float>(screenWidth), 25}, white, true));
+    entities.emplace("top", std::make_unique<Wall>("top", (LC_FRect){ 0, 0, static_cast<float>(screenWidth), 25 },
+                                                   white, true));
+    entities.emplace("bottom", std::make_unique<Wall>("bottom", (LC_FRect){
+                                                          0, static_cast<float>(screenHeight) - 25,
+                                                          static_cast<float>(screenWidth), 25
+                                                      }, white, true));
 
     // Setup Divider
     for (int32 i = 0, y = 40; y < 560; i++, y += 30) {
         Divider divider;
-        divider.id = "divider-" + std::to_string(i+1);
+        divider.id = "divider-" + std::to_string(i + 1);
         divider.transform = { 400 - 5 / static_cast<float>(2), static_cast<float>(y), 5, 20 };
         divider.color = LC_Color_Create(255.0f, 255.0f, 255.0f, 0.3f);
 
@@ -61,7 +63,7 @@ void Game::Setup() {
 SDL_AppResult Game::ProcessInput(const SDL_Event *event) {
     if (event->key.key == SDLK_ESCAPE ||
         event->type == SDL_EVENT_QUIT) {
-        return SDL_APP_SUCCESS;  /* end the program, reporting success to the OS. */
+        return SDL_APP_SUCCESS; /* end the program, reporting success to the OS. */
     }
 
     if (renderer && event->type == SDL_EVENT_WINDOW_RESIZED) {
@@ -70,13 +72,15 @@ SDL_AppResult Game::ProcessInput(const SDL_Event *event) {
     }
 
     if (event->type == SDL_EVENT_KEY_DOWN) {
-        switch(event->key.key) {
-            case SDLK_SPACE:
-                state = GameState::ACTIVE;
-                break;
-            case SDLK_RETURN:
-                ResetGame();
-                break;
+        switch (event->key.key) {
+        case SDLK_SPACE:
+            state = GameState::ACTIVE;
+            break;
+        case SDLK_RETURN:
+            ResetGame();
+            break;
+        default:
+            break;
         }
     }
 
@@ -87,11 +91,11 @@ SDL_AppResult Game::ProcessInput(const SDL_Event *event) {
 }
 
 void Game::Update(const double deltaTime) {
-    const auto leftPaddle = static_cast<Paddle*>(entities["leftPaddle"].get());
-    const auto rightPaddle = static_cast<Paddle*>(entities["rightPaddle"].get());
-    const auto topWall = static_cast<Wall*>(entities["top"].get());
-    const auto bottomWall = static_cast<Wall*>(entities["bottom"].get());
-    const auto ball = static_cast<Ball*>(entities["Ball"].get());
+    const auto leftPaddle = dynamic_cast<Paddle*>(entities["leftPaddle"].get());
+    const auto rightPaddle = dynamic_cast<Paddle*>(entities["rightPaddle"].get());
+    const auto topWall = dynamic_cast<Wall*>(entities["top"].get());
+    const auto bottomWall = dynamic_cast<Wall*>(entities["bottom"].get());
+    const auto ball = dynamic_cast<Ball*>(entities["Ball"].get());
 
     leftPaddle->Update(deltaTime, screenHeight);
     rightPaddle->Update(deltaTime, screenHeight);
@@ -102,7 +106,8 @@ void Game::Update(const double deltaTime) {
         if (static_cast<int32>(ball->transform.x) > screenWidth) {
             player1Score++;
             ResetGame();
-        } else if (static_cast<int32>(ball->transform.x < 0.0f)) {
+        }
+        else if (static_cast<int32>(ball->transform.x < 0.0f)) {
             player2Score++;
             ResetGame();
         }
@@ -114,8 +119,8 @@ void Game::Render() {
     LC_GL_ClearBackground(LC_Color_Create(0.0f, 0.0f, 0.5f, 1.0f));
 
     // Render Entities
-    for (const auto &entity : entities) {
-        entity.second->Render(renderer);
+    for (const auto& [id, entity] : entities) {
+        entity->Render(renderer);
     }
 
     // Render Score
@@ -134,8 +139,8 @@ void Game::RenderScore(const int32 score, const vec3 pos) const {
     snprintf(scoreString, 2, "%d", score);
     const LC_GL_Text scoreText = {
         .string = scoreString,
-        .position { pos[0], pos[1], pos[2] },
-        .color { 255.0f, 255.0f, 255.0f, 1.0f },
+        .position{ pos[0], pos[1], pos[2] },
+        .color{ 255.0f, 255.0f, 255.0f, 1.0f },
         .scale = 2.0f
     };
 
@@ -150,8 +155,8 @@ void Game::Unload() const {
     free(backingBuffer);
 }
 
-void Game::HandleCollisions(Ball &ball, const Paddle &leftPaddle, const Paddle &rightPaddle, const Wall &topWall,
-                            const Wall &bottomWall) const {
+void Game::HandleCollisions(Ball& ball, const Paddle& leftPaddle, const Paddle& rightPaddle, const Wall& topWall,
+                            const Wall& bottomWall) const {
     bool isCollided = false;
     if (ball.transform.x > static_cast<float>(screenWidth) / 2) {
         isCollided = LC_FRect_CheckCollisionAABB(&ball.transform, &rightPaddle.transform);
@@ -160,7 +165,8 @@ void Game::HandleCollisions(Ball &ball, const Paddle &leftPaddle, const Paddle &
             ball.transform.x = rightPaddle.transform.x - ball.transform.w;
             glm_vec2_normalize(ball.velocity);
         }
-    } else {
+    }
+    else {
         isCollided = LC_FRect_CheckCollisionAABB(&ball.transform, &leftPaddle.transform);
         if (isCollided) {
             CalculateBallDirection(ball, leftPaddle);
@@ -175,7 +181,8 @@ void Game::HandleCollisions(Ball &ball, const Paddle &leftPaddle, const Paddle &
             ball.transform.y = bottomWall.transform.y - ball.transform.h;
             glm_vec2_normalize(ball.velocity);
         }
-    } else {
+    }
+    else {
         isCollided = LC_FRect_CheckCollisionAABB(&ball.transform, &topWall.transform);
         if (isCollided) {
             ball.velocity[1] *= -1;
@@ -185,11 +192,11 @@ void Game::HandleCollisions(Ball &ball, const Paddle &leftPaddle, const Paddle &
     }
 }
 
-void Game::CalculateBallDirection(Ball &ball, const Paddle &paddle) const {
-    float centerPaddle = paddle.transform.y + paddle.transform.h / 2.0f;
-    float distance = (ball.transform.y + ball.transform.h / 2.0f) - centerPaddle;
-    float percentage = distance / (paddle.transform.h / 2.0f);
-    float strength = 2.0f;
+void Game::CalculateBallDirection(Ball& ball, const Paddle& paddle) {
+    const float centerPaddle = paddle.transform.y + paddle.transform.h / 2.0f;
+    const float distance = (ball.transform.y + ball.transform.h / 2.0f) - centerPaddle;
+    const float percentage = distance / (paddle.transform.h / 2.0f);
+    constexpr float strength = 2.0f;
     ball.velocity[1] = percentage * strength;
     ball.velocity[0] *= -1;
 }
