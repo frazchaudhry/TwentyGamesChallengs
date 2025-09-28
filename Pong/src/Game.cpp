@@ -124,8 +124,10 @@ void Game::Render() {
     }
 
     // Render Score
-    RenderScore(player1Score, (vec3){ 400.0f - 60.0f, 110.0f, 0.0f });
-    RenderScore(player2Score, (vec3){ 400.0f + 25.0f, 110.0f, 0.0f });
+    constexpr vec3 player1ScorePos = { 400.0f - 60.0f, 110.0f, 0.0f };
+    constexpr vec3 player2ScorePos = { 400.0f + 25.0f, 110.0f, 0.0f };
+    RenderScore(player1Score, player1ScorePos);
+    RenderScore(player2Score, player2ScorePos);
 
 
     // Swap buffers
