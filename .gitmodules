@@ -1,3 +1,3 @@
-[submodule "libs/LibraC"]
-	path = libs/LibraC
+[submodule "Pong/external/LibraC"]
+	path = Pong/external/LibraC
 	url = git@github.com:frazchaudhry/LibraC.git

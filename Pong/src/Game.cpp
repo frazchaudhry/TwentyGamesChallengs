@@ -139,11 +139,13 @@ void Game::Render() {
 void Game::RenderScore(const int32 score, const vec3 pos) const {
     char scoreString[2];
     snprintf(scoreString, 2, "%d", score);
-    const LC_GL_Text scoreText = {
+    LC_GL_Text scoreText = {
         .string = scoreString,
         .position{ pos[0], pos[1], pos[2] },
         .color{ 255.0f, 255.0f, 255.0f, 1.0f },
-        .scale = 2.0f
+        .scale = 2.0f,
+        .width = 0,
+        .height = 0
     };
 
     LC_GL_RenderText(renderer, &scoreText);
