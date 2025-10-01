@@ -1,8 +1,6 @@
 #ifndef GAME_HPP
 #define GAME_HPP
 
-#include <unordered_map>
-#include <memory>
 #include <string>
 
 extern "C" {
@@ -18,15 +16,49 @@ extern "C" {
 #define BALL_STARTING_POS (LC_FRect){ 400 - Ball::BALL_LENGTH / 2.0f, 300 - Ball::BALL_LENGTH / 2.0f, \
         Ball::BALL_LENGTH , Ball::BALL_LENGTH}
 
+#define WHITE { 255.0f, 255.0f, 255.0f, 1.0f }
+#define YELLOW { 255.0f, 255.0f, 0.0f, 1.0f }
+
 enum class GameState {
     ACTIVE,
     PAUSED,
     START,
     END,
-    MENU
+    TITLE
+};
+
+enum class TitleState {
+    Play,
+    Exit
 };
 
 class Game {
+    static constexpr int32 NUM_DIVIDERS = 18;
+    const std::string GAME_TITLE { "PONG" };
+    void *backingBuffer;
+    char errorLog[1024];
+    int32 screenWidth;
+    int32 screenHeight;
+    std::string fontFilePath;
+    LC_Arena *arena;
+    LC_GL_Renderer *renderer;
+    Wall topWall;
+    Wall bottomWall;
+    Divider dividers[NUM_DIVIDERS];
+    Paddle leftPaddle;
+    Paddle rightPaddle;
+    Ball ball;
+    int32 player1Score { 0 };
+    int32 player2Score { 0 };
+    std::string winner;
+    GameState state { GameState::TITLE };
+    TitleState titleState { TitleState::Play };
+
+    void RenderScore(int32 score, const vec3 pos) const;
+    void HandleCollisions();
+    void CalculateBallDirection(const Paddle &paddle);
+    void ResetGame();
+
 public:
     Game() = default;
     ~Game() = default;
@@ -37,26 +69,6 @@ public:
     void Update(double deltaTime);
     void Render();
     void Unload() const;
-
-private:
-    void *backingBuffer;
-    char errorLog[1024];
-    int32 screenWidth;
-    int32 screenHeight;
-    std::string fontFilePath;
-    LC_Arena *arena;
-    LC_GL_Renderer *renderer;
-    std::unordered_map<std::string, std::unique_ptr<Entity>> entities;
-    int32 player1Score { 0 };
-    int32 player2Score { 0 };
-    std::string winner;
-    GameState state { GameState::START };
-
-    void RenderScore(int32 score, const vec3 pos) const;
-    void HandleCollisions(Ball &ball, const Paddle &leftPaddle, const Paddle &rightPaddle, const Wall &topWall,
-                          const Wall &bottomWall) const;
-    static void CalculateBallDirection(Ball &ball, const Paddle &paddle);
-    void ResetGame();
 };
 
 #endif // GAME_HPP
