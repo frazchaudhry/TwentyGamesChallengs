@@ -17,9 +17,9 @@ bool Game::Init(const int32 width, const int32 height) {
         return false;
     }
 
-    // Disabling Vsync
+    // Enabling Vsync
     if (!SDL_GL_SetSwapInterval(1)) {
-        SDL_Log("Failed to disable Vsync.");
+        SDL_Log("Failed to enable Vsync.");
         return false;
     }
 
@@ -67,14 +67,14 @@ SDL_AppResult Game::ProcessInput(const SDL_Event *event) {
         if (event->type == SDL_EVENT_KEY_DOWN) {
             switch (event->key.key) {
                 case SDLK_UP:
-                    titleState = titleState == TitleState::Play ? TitleState::Exit : TitleState::Play;
+                    titleState = titleState == TitleMenuState::Play ? TitleMenuState::Exit : TitleMenuState::Play;
                     break;
                 case SDLK_DOWN:
-                    titleState = titleState == TitleState::Play ? TitleState::Exit : TitleState::Play;
+                    titleState = titleState == TitleMenuState::Play ? TitleMenuState::Exit : TitleMenuState::Play;
                     break;
                 case SDLK_RETURN:
-                    if (titleState == TitleState::Exit) return SDL_APP_SUCCESS;
-                    else if (titleState == TitleState::Play) state = GameState::START;
+                    if (titleState == TitleMenuState::Exit) return SDL_APP_SUCCESS;
+                    else if (titleState == TitleMenuState::Play) state = GameState::START;
                     break;
                 default:
                     break;
@@ -96,6 +96,33 @@ SDL_AppResult Game::ProcessInput(const SDL_Event *event) {
 
         leftPaddle.ProcessInput(event);
         rightPaddle.ProcessInput(event);
+    } else if (state == GameState::END) {
+        if (event->type == SDL_EVENT_KEY_DOWN) {
+            switch (event->key.key) {
+                case SDLK_UP:
+                    endState = endState == EndMenuState::TitleScreen ? EndMenuState::PlayAgain : EndMenuState::TitleScreen;
+                    break;
+                case SDLK_DOWN:
+                    endState = endState == EndMenuState::TitleScreen ? EndMenuState::PlayAgain : EndMenuState::TitleScreen;
+                    break;
+                case SDLK_RETURN:
+                    if (endState == EndMenuState::TitleScreen) {
+                        state = GameState::TITLE;
+                        player1Score = 0;
+                        player2Score = 0;
+                        ball.speed = ball.INITIAL_BALL_SPEED;
+                    }
+                    else if (endState == EndMenuState::PlayAgain) {
+                        state = GameState::START;
+                        player1Score = 0;
+                        player2Score = 0;
+                        ResetGame();
+                    }
+                    break;
+                default:
+                    break;
+            }
+        }
     }
     return SDL_APP_CONTINUE;
 }
@@ -114,6 +141,10 @@ void Game::Update(const double deltaTime) {
         else if (static_cast<int32>(ball.transform.x < 0.0f)) {
             player2Score++;
             ResetGame();
+        }
+        if (player1Score >= 7 || player2Score >= 7) {
+            state = GameState::END;
+            winnerText = player1Score >= 7 ? "PLAYER 1 WINS" : "PLAYER 2 WINS";
         }
     }
 }
@@ -139,7 +170,7 @@ void Game::Render() {
         };
         LC_GL_RenderText(renderer, &title);
         LC_GL_Text playText = {
-            .string = const_cast<char*>("Play"),
+            .string = const_cast<char*>("PLAY"),
             .position = { 370.0f, 350.0f, 0.0f },
             .color = { 255.0f, 255.0f, 255.0f, 1.0f },
             .scale = 1.0f,
@@ -147,22 +178,21 @@ void Game::Render() {
             .height = 0
         };
         LC_GL_Text exitText = {
-            .string = const_cast<char*>("Exit"),
+            .string = const_cast<char*>("EXIT"),
             .position = { 370.0f, 400.0f, 0.0f },
             .color = { 255.0f, 255.0f, 255.0f, 1.0f },
             .scale = 1.0f,
             .width = 0,
             .height = 0
         };
-        if (titleState == TitleState::Play) {
+        if (titleState == TitleMenuState::Play) {
             playText.color[2] = 0.0f;
         } else {
             exitText.color[2] = 0.0f;
         }
         LC_GL_RenderText(renderer, &playText);
         LC_GL_RenderText(renderer, &exitText);
-    } else {
-
+    } else if (state == GameState::ACTIVE || state == GameState::START) {
         // Render Entities
         topWall.Render(renderer);
         bottomWall.Render(renderer);
@@ -178,6 +208,44 @@ void Game::Render() {
         constexpr vec3 player2ScorePos = { 400.0f + 25.0f, 110.0f, 0.0f };
         RenderScore(player1Score, player1ScorePos);
         RenderScore(player2Score, player2ScorePos);
+    } else if (state == GameState::END) {
+        // Render Entities
+        topWall.Render(renderer);
+        bottomWall.Render(renderer);
+        leftPaddle.Render(renderer);
+        rightPaddle.Render(renderer);
+        LC_GL_Text winMessage = {
+            .string = const_cast<char*>(winnerText.c_str()),
+            .position = { 300.0f, 200.0f, 0.0f },
+            .color = { 255.0f , 255.0f, 255.0f, 1.0f },
+            .scale = 1.0f,
+            .width = 0,
+            .height = 0
+        };
+        LC_GL_RenderText(renderer, &winMessage);
+        LC_GL_Text titleScreenText = {
+            .string = const_cast<char*>("TITLE SCREEN"),
+            .position = { 320.0f, 400.0f, 0.0f },
+            .color = { 255.0f, 255.0f, 255.0f, 1.0f },
+            .scale = 1.0f,
+            .width = 0,
+            .height = 0
+        };
+        LC_GL_Text playAgainText = {
+            .string = const_cast<char*>("PLAY AGAIN"),
+            .position = { 320.0f, 450.0f, 0.0f },
+            .color = { 255.0f, 255.0f, 255.0f, 1.0f },
+            .scale = 1.0f,
+            .width = 0,
+            .height = 0
+        };
+        if (endState == EndMenuState::TitleScreen) {
+            titleScreenText.color[2] = 0.0f;
+        } else {
+            playAgainText.color[2] = 0.0f;
+        }
+        LC_GL_RenderText(renderer, &titleScreenText);
+        LC_GL_RenderText(renderer, &playAgainText);
     }
 
     // Swap buffers
@@ -215,6 +283,8 @@ void Game::HandleCollisions() {
         isCollided = LC_FRect_CheckCollisionAABB(&ball.transform, &rightPaddle.transform);
         if (isCollided) {
             CalculateBallDirection(rightPaddle);
+            ball.speed += 10;
+            if (ball.speed > ball.MAX_BALL_SPEED) ball.speed = ball.MAX_BALL_SPEED;
             ball.transform.x = rightPaddle.transform.x - ball.transform.w;
             glm_vec2_normalize(ball.velocity);
         }
@@ -223,6 +293,8 @@ void Game::HandleCollisions() {
         isCollided = LC_FRect_CheckCollisionAABB(&ball.transform, &leftPaddle.transform);
         if (isCollided) {
             CalculateBallDirection(leftPaddle);
+            ball.speed += 10;
+            if (ball.speed > ball.MAX_BALL_SPEED) ball.speed = ball.MAX_BALL_SPEED;
             ball.transform.x = leftPaddle.transform.x + leftPaddle.transform.w + 1;
             glm_vec2_normalize(ball.velocity);
         }
@@ -259,4 +331,6 @@ void Game::ResetGame() {
     rightPaddle.transform = RIGHT_PADDLE_STARTING_POS;
     ball.transform = BALL_STARTING_POS;
     state = GameState::START;
+    winnerText = "";
+    ball.speed = ball.INITIAL_BALL_SPEED;
 }

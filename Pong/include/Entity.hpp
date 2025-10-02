@@ -66,7 +66,9 @@ private:
 class Ball final : public Entity {
 public:
     static constexpr int32 BALL_LENGTH { 10 };
-    float speed { 300 };
+    static constexpr int32 INITIAL_BALL_SPEED { 300 };
+    static constexpr int32 MAX_BALL_SPEED { 800 };
+    float speed { INITIAL_BALL_SPEED };
 
     Ball() = default;
     Ball(const std::string &id, const LC_FRect &pos, const LC_Color &color);

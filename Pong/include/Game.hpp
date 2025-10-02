@@ -16,20 +16,21 @@ extern "C" {
 #define BALL_STARTING_POS (LC_FRect){ 400 - Ball::BALL_LENGTH / 2.0f, 300 - Ball::BALL_LENGTH / 2.0f, \
         Ball::BALL_LENGTH , Ball::BALL_LENGTH}
 
-#define WHITE { 255.0f, 255.0f, 255.0f, 1.0f }
-#define YELLOW { 255.0f, 255.0f, 0.0f, 1.0f }
-
 enum class GameState {
     ACTIVE,
-    PAUSED,
     START,
     END,
     TITLE
 };
 
-enum class TitleState {
+enum class TitleMenuState {
     Play,
     Exit
+};
+
+enum class EndMenuState {
+    TitleScreen,
+    PlayAgain
 };
 
 class Game {
@@ -50,9 +51,10 @@ class Game {
     Ball ball;
     int32 player1Score { 0 };
     int32 player2Score { 0 };
-    std::string winner;
+    std::string winnerText;
     GameState state { GameState::TITLE };
-    TitleState titleState { TitleState::Play };
+    TitleMenuState titleState { TitleMenuState::Play };
+    EndMenuState endState { EndMenuState::TitleScreen };
 
     void RenderScore(int32 score, const vec3 pos) const;
     void HandleCollisions();
