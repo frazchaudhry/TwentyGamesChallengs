@@ -1,4 +1,6 @@
 #include "Game.hpp"
+#include "SDL3/SDL_init.h"
+#include "SDL3/SDL_keycode.h"
 
 bool Game::Init(const int32 width, const int32 height) {
     backingBuffer = malloc(100 * 1024);
@@ -54,6 +56,7 @@ void Game::Setup() {
 }
 
 SDL_AppResult Game::ProcessInput(const SDL_Event *event) {
+    SDL_AppResult result = SDL_APP_CONTINUE;
     if (event->type == SDL_EVENT_QUIT) {
         return SDL_APP_SUCCESS; /* end the program, reporting success to the OS. */
     }
@@ -64,67 +67,15 @@ SDL_AppResult Game::ProcessInput(const SDL_Event *event) {
     }
 
     if (state == GameState::TITLE) {
-        if (event->type == SDL_EVENT_KEY_DOWN) {
-            switch (event->key.key) {
-                case SDLK_UP:
-                    titleState = titleState == TitleMenuState::Play ? TitleMenuState::Exit : TitleMenuState::Play;
-                    break;
-                case SDLK_DOWN:
-                    titleState = titleState == TitleMenuState::Play ? TitleMenuState::Exit : TitleMenuState::Play;
-                    break;
-                case SDLK_RETURN:
-                    if (titleState == TitleMenuState::Exit) return SDL_APP_SUCCESS;
-                    else if (titleState == TitleMenuState::Play) state = GameState::START;
-                    break;
-                default:
-                    break;
-            }
-        }
+        result = ProcessTitleInput(event);
     } else if (state == GameState::ACTIVE || state == GameState::START) {
-        if (event->type == SDL_EVENT_KEY_DOWN) {
-            switch (event->key.key) {
-                case SDLK_SPACE:
-                    state = GameState::ACTIVE;
-                    break;
-                case SDLK_RETURN:
-                    ResetGame();
-                    break;
-                default:
-                    break;
-            }
-        }
-
-        leftPaddle.ProcessInput(event);
-        rightPaddle.ProcessInput(event);
+        result = ProcessGameInput(event);
+    } else if (state == GameState::PAUSED) {
+        result = ProcessPausedInput(event);
     } else if (state == GameState::END) {
-        if (event->type == SDL_EVENT_KEY_DOWN) {
-            switch (event->key.key) {
-                case SDLK_UP:
-                    endState = endState == EndMenuState::TitleScreen ? EndMenuState::PlayAgain : EndMenuState::TitleScreen;
-                    break;
-                case SDLK_DOWN:
-                    endState = endState == EndMenuState::TitleScreen ? EndMenuState::PlayAgain : EndMenuState::TitleScreen;
-                    break;
-                case SDLK_RETURN:
-                    if (endState == EndMenuState::TitleScreen) {
-                        state = GameState::TITLE;
-                        player1Score = 0;
-                        player2Score = 0;
-                        ball.speed = ball.INITIAL_BALL_SPEED;
-                    }
-                    else if (endState == EndMenuState::PlayAgain) {
-                        state = GameState::START;
-                        player1Score = 0;
-                        player2Score = 0;
-                        ResetGame();
-                    }
-                    break;
-                default:
-                    break;
-            }
-        }
+        result = ProcessEndInput(event);
     }
-    return SDL_APP_CONTINUE;
+    return result;
 }
 
 void Game::Update(const double deltaTime) {
@@ -160,31 +111,7 @@ void Game::Render() {
 
         leftPaddle.Render(renderer);
         rightPaddle.Render(renderer);
-        LC_GL_Text title = {
-            .string = const_cast<char*>(GAME_TITLE.c_str()),
-            .position = { 300.0f, 150.0f, 0.0f },
-            .color = { 255.0f, 255.0f, 255.0f, 255.0f },
-            .scale = 3.0f,
-            .width = 0,
-            .height = 0
-        };
         LC_GL_RenderText(renderer, &title);
-        LC_GL_Text playText = {
-            .string = const_cast<char*>("PLAY"),
-            .position = { 370.0f, 350.0f, 0.0f },
-            .color = { 255.0f, 255.0f, 255.0f, 1.0f },
-            .scale = 1.0f,
-            .width = 0,
-            .height = 0
-        };
-        LC_GL_Text exitText = {
-            .string = const_cast<char*>("EXIT"),
-            .position = { 370.0f, 400.0f, 0.0f },
-            .color = { 255.0f, 255.0f, 255.0f, 1.0f },
-            .scale = 1.0f,
-            .width = 0,
-            .height = 0
-        };
         if (titleState == TitleMenuState::Play) {
             playText.color[2] = 0.0f;
         } else {
@@ -192,6 +119,8 @@ void Game::Render() {
         }
         LC_GL_RenderText(renderer, &playText);
         LC_GL_RenderText(renderer, &exitText);
+        playText.color[2] = 255.0f;
+        exitText.color[2] = 255.0f;
     } else if (state == GameState::ACTIVE || state == GameState::START) {
         // Render Entities
         topWall.Render(renderer);
@@ -208,44 +137,52 @@ void Game::Render() {
         constexpr vec3 player2ScorePos = { 400.0f + 25.0f, 110.0f, 0.0f };
         RenderScore(player1Score, player1ScorePos);
         RenderScore(player2Score, player2ScorePos);
+    } else if (state == GameState::PAUSED) {
+        // Render Entities
+        topWall.Render(renderer);
+        bottomWall.Render(renderer);
+        leftPaddle.Render(renderer);
+        rightPaddle.Render(renderer);
+        ball.Render(renderer);
+
+        // Render Score
+        constexpr vec3 player1ScorePos = { 400.0f - 60.0f, 110.0f, 0.0f };
+        constexpr vec3 player2ScorePos = { 400.0f + 25.0f, 110.0f, 0.0f };
+        RenderScore(player1Score, player1ScorePos);
+        RenderScore(player2Score, player2ScorePos);
+
+        menuTitle.string = const_cast<char*>("PAUSED");
+        option1.string = const_cast<char*>("RESUME");
+        option2.string = const_cast<char*>("TITLE SCREEN");
+        LC_GL_RenderText(renderer, &menuTitle);
+        if (pausedState == PauseMenuState::Resume) {
+            option1.color[2] = 0.0f;
+        } else {
+            option2.color[2] = 0.0f;
+        }
+        LC_GL_RenderText(renderer, &option1);
+        LC_GL_RenderText(renderer, &option2);
+        option1.color[2] = 255.0f;
+        option2.color[2] = 255.0f;
     } else if (state == GameState::END) {
         // Render Entities
         topWall.Render(renderer);
         bottomWall.Render(renderer);
         leftPaddle.Render(renderer);
         rightPaddle.Render(renderer);
-        LC_GL_Text winMessage = {
-            .string = const_cast<char*>(winnerText.c_str()),
-            .position = { 300.0f, 200.0f, 0.0f },
-            .color = { 255.0f , 255.0f, 255.0f, 1.0f },
-            .scale = 1.0f,
-            .width = 0,
-            .height = 0
-        };
-        LC_GL_RenderText(renderer, &winMessage);
-        LC_GL_Text titleScreenText = {
-            .string = const_cast<char*>("TITLE SCREEN"),
-            .position = { 320.0f, 400.0f, 0.0f },
-            .color = { 255.0f, 255.0f, 255.0f, 1.0f },
-            .scale = 1.0f,
-            .width = 0,
-            .height = 0
-        };
-        LC_GL_Text playAgainText = {
-            .string = const_cast<char*>("PLAY AGAIN"),
-            .position = { 320.0f, 450.0f, 0.0f },
-            .color = { 255.0f, 255.0f, 255.0f, 1.0f },
-            .scale = 1.0f,
-            .width = 0,
-            .height = 0
-        };
+        menuTitle.string = const_cast<char*>(winnerText.c_str());
+        option1.string = const_cast<char*>("TITLE SCREEN");
+        option2.string = const_cast<char*>("PLAY AGAIN");
+        LC_GL_RenderText(renderer, &menuTitle);
         if (endState == EndMenuState::TitleScreen) {
-            titleScreenText.color[2] = 0.0f;
+            option1.color[2] = 0.0f;
         } else {
-            playAgainText.color[2] = 0.0f;
+            option2.color[2] = 0.0f;
         }
-        LC_GL_RenderText(renderer, &titleScreenText);
-        LC_GL_RenderText(renderer, &playAgainText);
+        LC_GL_RenderText(renderer, &option1);
+        LC_GL_RenderText(renderer, &option2);
+        option1.color[2] = 255.0f;
+        option2.color[2] = 255.0f;
     }
 
     // Swap buffers
@@ -333,4 +270,100 @@ void Game::ResetGame() {
     state = GameState::START;
     winnerText = "";
     ball.speed = ball.INITIAL_BALL_SPEED;
+}
+
+SDL_AppResult Game::ProcessTitleInput(const SDL_Event *event) {
+    if (event->type == SDL_EVENT_KEY_DOWN) {
+        switch (event->key.key) {
+            case SDLK_UP:
+                titleState = titleState == TitleMenuState::Play ? TitleMenuState::Exit : TitleMenuState::Play;
+                break;
+            case SDLK_DOWN:
+                titleState = titleState == TitleMenuState::Play ? TitleMenuState::Exit : TitleMenuState::Play;
+                break;
+            case SDLK_RETURN:
+                if (titleState == TitleMenuState::Exit) return SDL_APP_SUCCESS;
+                else if (titleState == TitleMenuState::Play) state = GameState::START;
+                break;
+            default:
+                break;
+        }
+    }
+    return SDL_APP_CONTINUE;
+}
+
+SDL_AppResult Game::ProcessGameInput(const SDL_Event *event) {
+    if (event->type == SDL_EVENT_KEY_DOWN) {
+        switch (event->key.key) {
+            case SDLK_SPACE:
+                state = GameState::ACTIVE;
+                break;
+            case SDLK_RETURN:
+                ResetGame();
+                break;
+            case SDLK_ESCAPE:
+                state = GameState::PAUSED;
+            default:
+                break;
+        }
+    }
+
+    leftPaddle.ProcessInput(event);
+    rightPaddle.ProcessInput(event);
+    return SDL_APP_CONTINUE;
+}
+
+SDL_AppResult Game::ProcessPausedInput(const SDL_Event *event) {
+    if (event->type == SDL_EVENT_KEY_DOWN) {
+        switch (event->key.key) {
+            case SDLK_UP:
+                pausedState = pausedState == PauseMenuState::Resume ? PauseMenuState::TitleScreen : PauseMenuState::Resume;
+                break;
+            case SDLK_DOWN:
+                pausedState = pausedState == PauseMenuState::Resume ? PauseMenuState::TitleScreen : PauseMenuState::Resume;
+                break;
+            case SDLK_RETURN:
+                if (pausedState == PauseMenuState::Resume) {
+                    state = GameState::ACTIVE;
+                }
+                else if (pausedState == PauseMenuState::TitleScreen) {
+                    ResetGame();
+                    state = GameState::TITLE;
+                }
+                break;
+            default:
+                break;
+        }
+    }
+    return SDL_APP_CONTINUE;
+}
+
+SDL_AppResult Game::ProcessEndInput(const SDL_Event *event) {
+    if (event->type == SDL_EVENT_KEY_DOWN) {
+        switch (event->key.key) {
+            case SDLK_UP:
+                endState = endState == EndMenuState::TitleScreen ? EndMenuState::PlayAgain : EndMenuState::TitleScreen;
+                break;
+            case SDLK_DOWN:
+                endState = endState == EndMenuState::TitleScreen ? EndMenuState::PlayAgain : EndMenuState::TitleScreen;
+                break;
+            case SDLK_RETURN:
+                if (endState == EndMenuState::TitleScreen) {
+                    state = GameState::TITLE;
+                    player1Score = 0;
+                    player2Score = 0;
+                    ball.speed = ball.INITIAL_BALL_SPEED;
+                }
+                else if (endState == EndMenuState::PlayAgain) {
+                    state = GameState::START;
+                    player1Score = 0;
+                    player2Score = 0;
+                    ResetGame();
+                }
+                break;
+            default:
+                break;
+        }
+    }
+    return SDL_APP_CONTINUE;
 }
