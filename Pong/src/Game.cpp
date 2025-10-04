@@ -1,6 +1,5 @@
 #include "Game.hpp"
-#include "SDL3/SDL_init.h"
-#include "SDL3/SDL_keycode.h"
+#include "libraVideo.h"
 
 bool Game::Init(const int32 width, const int32 height) {
     backingBuffer = malloc(100 * 1024);
@@ -80,7 +79,8 @@ SDL_AppResult Game::ProcessInput(const SDL_Event *event) {
 
 void Game::Update(const double deltaTime) {
     leftPaddle.Update(deltaTime, screenHeight);
-    rightPaddle.Update(deltaTime, screenHeight);
+    if (!isAi) rightPaddle.Update(deltaTime, screenHeight);
+    else rightPaddle.UpdateAi(deltaTime, ball.transform.y, screenHeight);
 
     if (state == GameState::ACTIVE) {
         HandleCollisions();
@@ -112,14 +112,18 @@ void Game::Render() {
         leftPaddle.Render(renderer);
         rightPaddle.Render(renderer);
         LC_GL_RenderText(renderer, &title);
-        if (titleState == TitleMenuState::Play) {
+        if (titleState == TitleMenuState::TWOPLAYERS) {
             playText.color[2] = 0.0f;
-        } else {
+        } else if (titleState == TitleMenuState::ONEPLAYER) {
+            playSinglePlayerText.color[2] = 0.0f;
+        } else if (titleState == TitleMenuState::Exit){
             exitText.color[2] = 0.0f;
         }
         LC_GL_RenderText(renderer, &playText);
+        LC_GL_RenderText(renderer, &playSinglePlayerText);
         LC_GL_RenderText(renderer, &exitText);
         playText.color[2] = 255.0f;
+        playSinglePlayerText.color[2] = 255.0f;
         exitText.color[2] = 255.0f;
     } else if (state == GameState::ACTIVE || state == GameState::START) {
         // Render Entities
@@ -276,14 +280,22 @@ SDL_AppResult Game::ProcessTitleInput(const SDL_Event *event) {
     if (event->type == SDL_EVENT_KEY_DOWN) {
         switch (event->key.key) {
             case SDLK_UP:
-                titleState = titleState == TitleMenuState::Play ? TitleMenuState::Exit : TitleMenuState::Play;
+                if (titleState == TitleMenuState::TWOPLAYERS) titleState = TitleMenuState::Exit;
+                else if (titleState == TitleMenuState::ONEPLAYER) titleState = TitleMenuState::TWOPLAYERS;
+                else if (titleState == TitleMenuState::Exit) titleState = TitleMenuState::ONEPLAYER;
                 break;
             case SDLK_DOWN:
-                titleState = titleState == TitleMenuState::Play ? TitleMenuState::Exit : TitleMenuState::Play;
+                if (titleState == TitleMenuState::TWOPLAYERS) titleState = TitleMenuState::ONEPLAYER;
+                else if (titleState == TitleMenuState::ONEPLAYER) titleState = TitleMenuState::Exit;
+                else if (titleState == TitleMenuState::Exit) titleState = TitleMenuState::TWOPLAYERS;
                 break;
             case SDLK_RETURN:
                 if (titleState == TitleMenuState::Exit) return SDL_APP_SUCCESS;
-                else if (titleState == TitleMenuState::Play) state = GameState::START;
+                else if (titleState == TitleMenuState::TWOPLAYERS) state = GameState::START;
+                else if (titleState == TitleMenuState::ONEPLAYER) {
+                    state = GameState::START;
+                    isAi = true;
+                }
                 break;
             default:
                 break;
@@ -309,7 +321,7 @@ SDL_AppResult Game::ProcessGameInput(const SDL_Event *event) {
     }
 
     leftPaddle.ProcessInput(event);
-    rightPaddle.ProcessInput(event);
+    if (!isAi) rightPaddle.ProcessInput(event);
     return SDL_APP_CONTINUE;
 }
 
@@ -353,6 +365,7 @@ SDL_AppResult Game::ProcessEndInput(const SDL_Event *event) {
                     player1Score = 0;
                     player2Score = 0;
                     ball.speed = ball.INITIAL_BALL_SPEED;
+                    isAi = false;
                 }
                 else if (endState == EndMenuState::PlayAgain) {
                     state = GameState::START;

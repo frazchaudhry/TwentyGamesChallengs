@@ -55,7 +55,7 @@ void Paddle::ProcessInput(const SDL_Event *event) {
         } else if (event->key.key == SDLK_DOWN && event->type == SDL_EVENT_KEY_DOWN) {
             state = PaddleState::DOWN;
         }
-    }
+    } 
 }
 
 void Paddle::Update(const double deltaTime, const int32 screenHeight) {
@@ -65,6 +65,16 @@ void Paddle::Update(const double deltaTime, const int32 screenHeight) {
         transform.y -= paddleVelocity * deltaTimeF;
     } else if (state == PaddleState::DOWN && transform.y <= static_cast<float>(screenHeight) - (PADDLE_HEIGHT + Wall::HEIGHT)) {
         transform.y += paddleVelocity * deltaTimeF;
+    }
+}
+
+void Paddle::UpdateAi(double deltaTime, float ballY, int32 screenHeight) {
+    const auto deltaTimeF = static_cast<float>(deltaTime);
+    constexpr auto paddleVelocity = static_cast<float>(PADDLE_VELOCITY);
+    if (transform.y + transform.h / 2 < ballY + 5 && transform.y <= static_cast<float>(screenHeight) - (PADDLE_HEIGHT + Wall::HEIGHT)) {
+        transform.y += paddleVelocity * deltaTimeF;
+    } else if (transform.y + transform.h / 2 > ballY + 5 && transform.y >= Wall::HEIGHT) {
+        transform.y -= paddleVelocity * deltaTimeF;
     }
 }
 

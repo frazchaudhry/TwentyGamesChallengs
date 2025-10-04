@@ -53,6 +53,7 @@ public:
 
     void ProcessInput(const SDL_Event *event) override;
     void Update(double deltaTime, int32 screenHeight) override;
+    void UpdateAi(double deltaTime, float ballY, int32 screenHeight);
 private:
     enum class PaddleState {
         STOP,

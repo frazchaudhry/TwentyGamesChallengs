@@ -25,7 +25,8 @@ enum class GameState {
 };
 
 enum class TitleMenuState {
-    Play,
+    TWOPLAYERS,
+    ONEPLAYER,
     Exit
 };
 
@@ -66,8 +67,16 @@ class Game {
         .height = 0
     };
     LC_GL_Text playText = {
-        .string = const_cast<char*>("PLAY"),
+        .string = const_cast<char*>("2 PLAYERS"),
         .position = { 370.0f, 350.0f, 0.0f },
+        .color = { 255.0f, 255.0f, 255.0f, 1.0f },
+        .scale = 1.0f,
+        .width = 0,
+        .height = 0
+    };
+    LC_GL_Text playSinglePlayerText = {
+        .string = const_cast<char*>("1 PLAYER"),
+        .position = { 370.0f, 400.0f, 0.0f },
         .color = { 255.0f, 255.0f, 255.0f, 1.0f },
         .scale = 1.0f,
         .width = 0,
@@ -75,7 +84,7 @@ class Game {
     };
     LC_GL_Text exitText = {
         .string = const_cast<char*>("EXIT"),
-        .position = { 370.0f, 400.0f, 0.0f },
+        .position = { 370.0f, 450.0f, 0.0f },
         .color = { 255.0f, 255.0f, 255.0f, 1.0f },
         .scale = 1.0f,
         .width = 0,
@@ -107,7 +116,7 @@ class Game {
     };
     std::string winnerText;
     GameState state { GameState::TITLE };
-    TitleMenuState titleState { TitleMenuState::Play };
+    TitleMenuState titleState { TitleMenuState::TWOPLAYERS };
     PauseMenuState pausedState { PauseMenuState::Resume };
     EndMenuState endState { EndMenuState::TitleScreen };
 
@@ -121,6 +130,8 @@ class Game {
     void ResetGame();
 
 public:
+    bool isAi { false };
+
     Game() = default;
     ~Game() = default;
 
