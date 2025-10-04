@@ -1,7 +1,9 @@
 #ifndef GAME_HPP
 #define GAME_HPP
 
+#include "SDL3/SDL_properties.h"
 #include <string>
+#include <SDL3_mixer/SDL_mixer.h>
 
 extern "C" {
 #include <libraVideo.h>
@@ -119,6 +121,10 @@ class Game {
     TitleMenuState titleState { TitleMenuState::TWOPLAYERS };
     PauseMenuState pausedState { PauseMenuState::Resume };
     EndMenuState endState { EndMenuState::TitleScreen };
+    MIX_Mixer *mixer { nullptr };
+    MIX_Audio *sound { nullptr };
+    MIX_Track *track { nullptr };
+    SDL_PropertiesID props;
 
     SDL_AppResult ProcessTitleInput(const SDL_Event *event);
     SDL_AppResult ProcessGameInput(const SDL_Event *event);

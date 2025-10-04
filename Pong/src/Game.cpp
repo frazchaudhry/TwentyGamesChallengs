@@ -52,6 +52,18 @@ void Game::Setup() {
 
     // Setup Ball
     ball = Ball("Ball", BALL_STARTING_POS, white);
+
+    // Init Audio    
+    if (!MIX_Init()) {
+        SDL_Log("MIX_Init failed: %s", SDL_GetError());
+    }
+
+    mixer = MIX_CreateMixerDevice(SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK, nullptr);
+
+    props = SDL_CreateProperties();
+    SDL_SetNumberProperty(props, MIX_PROP_PLAY_LOOPS_NUMBER, 0);
+    sound = MIX_LoadAudio(mixer, "assets/impactMetal_medium_004.ogg", false);
+    track = MIX_CreateTrack(mixer);
 }
 
 SDL_AppResult Game::ProcessInput(const SDL_Event *event) {
@@ -228,6 +240,9 @@ void Game::HandleCollisions() {
             if (ball.speed > ball.MAX_BALL_SPEED) ball.speed = ball.MAX_BALL_SPEED;
             ball.transform.x = rightPaddle.transform.x - ball.transform.w;
             glm_vec2_normalize(ball.velocity);
+            MIX_SetTrackAudio(track, sound);
+            MIX_PlayTrack(track, props);
+
         }
     }
     else {
@@ -238,6 +253,8 @@ void Game::HandleCollisions() {
             if (ball.speed > ball.MAX_BALL_SPEED) ball.speed = ball.MAX_BALL_SPEED;
             ball.transform.x = leftPaddle.transform.x + leftPaddle.transform.w + 1;
             glm_vec2_normalize(ball.velocity);
+            MIX_SetTrackAudio(track, sound);
+            MIX_PlayTrack(track, props);
         }
     }
     if (ball.transform.y > static_cast<float>(screenHeight) / 2) {
@@ -340,6 +357,7 @@ SDL_AppResult Game::ProcessPausedInput(const SDL_Event *event) {
                 }
                 else if (pausedState == PauseMenuState::TitleScreen) {
                     ResetGame();
+                    isAi = false;
                     state = GameState::TITLE;
                 }
                 break;
