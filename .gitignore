@@ -18,6 +18,83 @@ CMakeUserPresets.json
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 cmake-build-*
 
+# Rider
 .idea/
+*.sln.DotSettings.user
+
 .cache/
 build/
+bin/
+obj/
+
+# Visual Studio
+.vs/
+*.suo
+*.user
+*.userprefs
+*.ncb
+*.vcproj.filters
+*.aps
+*.pdb
+*.obj
+*.log
+*.bak
+*.sbr
+*.bsc
+*.lib
+*.ilk
+*.netmodule
+*.exp
+*.vshost.*
+*.testsettings
+*.trx
+*.rdc
+*.sdf
+*.cache
+*.ipch
+*.resharper
+*.resharper.user
+*.dotSettings
+*.dotSettings.user
+*.pidb
+*.vsp
+*.coverage
+*.coveragexml
+*.dbmdl
+*.licx
+*.tlog
+*.lastbuildstate
+*.VC.db
+
+# Build results
+[Dd]ebug/
+[Rr]elease/
+[Bb]in/
+[Oo]bj/
+*.exe
+*.dll
+*.com
+*.manifest
+*.resources
+*.tmp
+*.temp
+*.user
+*.buildlog
+*.xps
+*.xml
+*.cache
+*.pfx
+*.snk
+
+# Packages
+packages/
+*.nupkg
+*.nuget
+*.snk
+
+# Visual Studio Code
+.vscode/
+
+# Other
+Thumbs.db
+Desktop.ini
