@@ -1,4 +1,5 @@
-﻿using FlappyBird.Utilities;
+﻿using FlappyBird.Render;
+using FlappyBird.Utilities;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -14,9 +15,11 @@ internal class FlappyBird : Game
         flappyBird.Run();
     }
 
+    private ResolutionIndependentRenderer _renderer;
     private SpriteFont? _font;
     private SpriteBatch? _spriteBatch;
     private readonly FpsCounter _fpsCounter;
+    private Texture2D? _background;
     private KeyboardState _keyboardPrev;
     private MouseState _mousePrev;
     private GamePadState _gpPrev;
@@ -30,12 +33,14 @@ internal class FlappyBird : Game
         Content.RootDirectory = "Content";
         
         // Typically you would load a config here...
-        gdm.PreferredBackBufferWidth = 1280;
-        gdm.PreferredBackBufferHeight = 720;
-        gdm.IsFullScreen = false;
         gdm.SynchronizeWithVerticalRetrace = true;
+        _renderer = new ResolutionIndependentRenderer(ref gdm);
+        _renderer.SetVirtualResolution(640, 360);
+        _renderer.SetResolution(800, 600, false);
+        
         IsFixedTimeStep = false;
         _fpsCounter = new FpsCounter();
+
     }
     
     protected override void Initialize()
@@ -47,6 +52,7 @@ internal class FlappyBird : Game
     {
         _spriteBatch = new SpriteBatch(GraphicsDevice);
         _font = Content.Load<SpriteFont>("Hud");
+        _background = Content.Load<Texture2D>("grass-field");
         base.LoadContent();
     }
 
@@ -85,8 +91,13 @@ internal class FlappyBird : Game
         
         // Draw the texture to the corner of the screen
         if (_spriteBatch is null) return;
-        _spriteBatch.Begin();
-        if (_font != null) _fpsCounter.Draw(_spriteBatch, _font, new Vector2(1190, 10), Color.White);
+        _renderer.BeginDraw();
+        _spriteBatch.Begin(SpriteSortMode.BackToFront, BlendState.AlphaBlend, SamplerState.LinearWrap, 
+            DepthStencilState.None, RasterizerState.CullNone, null, _renderer.GetTransformationMatrix());
+        
+        _spriteBatch.Draw(_background, Vector2.Zero, new Rectangle(0, 0, 640, 360), Color.White);
+        if (_font != null) _fpsCounter.Draw(_spriteBatch, _font, new Vector2(GraphicsDevice.PresentationParameters.BackBufferWidth - 90, 10), Color.White);
+        
         _spriteBatch.End();
         base.Draw(gameTime);
     }
