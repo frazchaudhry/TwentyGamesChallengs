@@ -78,7 +78,7 @@ public class Body
         SumTorque = 0.0f;
     }
 
-    public void ApplyImpulse(ref Vector2 j)
+    public void ApplyImpulse(Vector2 j)
     {
         if (IsStatic()) return;
 

@@ -1,4 +1,5 @@
-﻿using FlappyBird.Render;
+﻿using System.Runtime.CompilerServices;
+using FlappyBird.Render;
 using FlappyBird.Utilities;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
