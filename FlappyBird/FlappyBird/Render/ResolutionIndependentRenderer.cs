@@ -38,6 +38,11 @@ public class ResolutionIndependentRenderer(ref GraphicsDeviceManager deviceManag
         _isDirtyMatrix = true;
     }
 
+    public Vector2 GetVirtualResolution()
+    {
+        return new Vector2(_virtualWidth, _virtualHeight);
+    }
+
     private void ApplyResolutionSettings()
     {
         // if we aren't using fullscreen mode, the height and width of the window can be set to anything equal to or

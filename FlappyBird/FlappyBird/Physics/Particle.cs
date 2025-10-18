@@ -24,12 +24,7 @@ public class Particle
         Console.WriteLine("Particle constructor called!");
     }
 
-    public Particle()
-    {
-        Console.WriteLine("Particle Destructor called!");
-    }
-
-    public void AddForce(Vector2 force)
+    public void AddForce(ref Vector2 force)
     {
         SumForces += force;
     }

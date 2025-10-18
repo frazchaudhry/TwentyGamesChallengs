@@ -96,7 +96,7 @@ internal class FlappyBird : Game
             DepthStencilState.None, RasterizerState.CullNone, null, _renderer.GetTransformationMatrix());
         
         _spriteBatch.Draw(_background, Vector2.Zero, new Rectangle(0, 0, 640, 360), Color.White);
-        if (_font != null) _fpsCounter.Draw(_spriteBatch, _font, new Vector2(GraphicsDevice.PresentationParameters.BackBufferWidth - 90, 10), Color.White);
+        if (_font != null) _fpsCounter.Draw(_spriteBatch, _font, new Vector2(_renderer.GetVirtualResolution().X - 90, 10), Color.White);
         
         _spriteBatch.End();
         base.Draw(gameTime);
