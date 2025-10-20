@@ -29,5 +29,13 @@
       <ProjectReference Include="..\..\libs\Nez\Nez.ImGui\Nez.FNA.Core.ImGui.csproj" />
       <ProjectReference Include="..\..\libs\Nez\Nez.Portable\Nez.FNA.Core.csproj" />
     </ItemGroup>
+    
+    <Target Name="CopyfnalibsToBuildDirectory" BeforeTargets="BeforeBuild">
+        <ItemGroup>
+            <FilesToCopy Condition="$([MSBUILD]::IsOSPlatform('Linux'))" Include="..\..\libs\fnalibs\lib64\*" />
+            <FilesToCopy Condition="$([MSBUILD]::IsOSPlatform('Windows'))" Include="..\..\libs\fnalibs\x64\*" />
+        </ItemGroup>
+        <Copy SourceFiles="@(FilesToCopy)" DestinationFolder="$(OutputPath)" SkipUnchangedFiles="true" />
+    </Target>
 
 </Project>
