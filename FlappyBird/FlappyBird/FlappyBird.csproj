@@ -5,7 +5,7 @@
         <TargetFramework>net9.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
-        <PublishAot>true</PublishAot>
+        <PublishAot>false</PublishAot>
         <InvariantGlobalization>true</InvariantGlobalization>
     </PropertyGroup>
 
@@ -26,6 +26,8 @@
 
     <ItemGroup>
       <ProjectReference Include="..\..\libs\FNA\FNA.Core.csproj" />
+      <ProjectReference Include="..\..\libs\Nez\Nez.ImGui\Nez.FNA.Core.ImGui.csproj" />
+      <ProjectReference Include="..\..\libs\Nez\Nez.Portable\Nez.FNA.Core.csproj" />
     </ItemGroup>
 
 </Project>

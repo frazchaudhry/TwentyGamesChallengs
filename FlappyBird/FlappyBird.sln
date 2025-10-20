@@ -2,7 +2,11 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FlappyBird", "FlappyBird\FlappyBird.csproj", "{92262833-9B25-4210-8C36-33BE7936F775}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FNA.Core", "..\libs\FNA\FNA.Core.csproj", "{1D2D7D32-D5DF-4FA4-959A-80560F36498A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FNA.Core", "..\libs\FNA\FNA.Core.csproj", "{33CFBB51-3301-4373-A4F4-01B00B433982}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nez.FNA.Core", "..\libs\Nez\Nez.Portable\Nez.FNA.Core.csproj", "{CBA4F9CE-B94C-48FE-8FA9-CEA7AAB0886B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nez.FNA.Core.ImGui", "..\libs\Nez\Nez.ImGui\Nez.FNA.Core.ImGui.csproj", "{7CA9E03E-3179-49D7-B3B0-31DB3978EDD3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -18,9 +22,17 @@ Global
 		{9524E55F-DBB9-4847-BE59-4F94D0EDE056}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9524E55F-DBB9-4847-BE59-4F94D0EDE056}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9524E55F-DBB9-4847-BE59-4F94D0EDE056}.Release|Any CPU.Build.0 = Release|Any CPU
-		{1D2D7D32-D5DF-4FA4-959A-80560F36498A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{1D2D7D32-D5DF-4FA4-959A-80560F36498A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{1D2D7D32-D5DF-4FA4-959A-80560F36498A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{1D2D7D32-D5DF-4FA4-959A-80560F36498A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{33CFBB51-3301-4373-A4F4-01B00B433982}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{33CFBB51-3301-4373-A4F4-01B00B433982}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{33CFBB51-3301-4373-A4F4-01B00B433982}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{33CFBB51-3301-4373-A4F4-01B00B433982}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CBA4F9CE-B94C-48FE-8FA9-CEA7AAB0886B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CBA4F9CE-B94C-48FE-8FA9-CEA7AAB0886B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CBA4F9CE-B94C-48FE-8FA9-CEA7AAB0886B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CBA4F9CE-B94C-48FE-8FA9-CEA7AAB0886B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7CA9E03E-3179-49D7-B3B0-31DB3978EDD3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7CA9E03E-3179-49D7-B3B0-31DB3978EDD3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7CA9E03E-3179-49D7-B3B0-31DB3978EDD3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7CA9E03E-3179-49D7-B3B0-31DB3978EDD3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

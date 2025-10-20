@@ -1,6 +1,9 @@
 [submodule "Pong/external/LibraC"]
 	path = Pong/external/LibraC
 	url = git@github.com:frazchaudhry/LibraC.git
+[submodule "libs/Nez"]
+	path = libs/Nez
+	url = git@github.com:prime31/Nez.git
 [submodule "libs/FNA"]
 	path = libs/FNA
-	url = https://github.com/FNA-XNA/FNA
+	url = git@github.com:FNA-XNA/FNA.git
