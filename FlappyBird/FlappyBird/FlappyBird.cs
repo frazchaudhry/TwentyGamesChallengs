@@ -24,7 +24,7 @@ internal class FlappyBird : Core
     {
         _sceneResolutionPolicy = Scene.SceneResolutionPolicy.BestFit;
         Scene.SetDefaultDesignResolution(640, 360, _sceneResolutionPolicy);
-        Window.AllowUserResizing = true;
+        Window.AllowUserResizing = false;
     }
     
     protected override void Initialize()
