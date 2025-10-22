@@ -30,6 +30,9 @@ public class Body
     // Coefficient of restitution (elasticity)
     public float Restitution;
     
+    // Coefficient of friction
+    public float Friction;
+    
     // A pointer to the geometry shape of the rigid body (circle/box/polygon)
     public Shape? Shape = null;
 
@@ -45,6 +48,7 @@ public class Body
         SumForces = new Vector2(0.0f, 0.0f);
         SumTorque = 0.0f;
         Restitution = 1.0f;
+        Friction = 0.7f;
         Mass = mass;
         InvMass = mass != 0.0f ? 1.0f / mass : 0.0f;
         I = shape.GetMomentOfInertia() * mass;
@@ -83,6 +87,14 @@ public class Body
         if (IsStatic()) return;
 
         Velocity += j * InvMass;
+    }
+
+    public void ApplyImpulse(Vector2 j, Vector2 r)
+    {
+        if (IsStatic()) return;
+
+        Velocity += j * InvMass;
+        AngularVelocity += r.Cross(ref j) * InvI;
     }
 
     public void IntegrateLinear(float dt)

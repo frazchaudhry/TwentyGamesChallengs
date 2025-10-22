@@ -31,21 +31,38 @@ public class Contact
 
         // Define elasticity (coefficient of restitution e)
         var e = Math.Min(A.Restitution, B.Restitution);
+        var f = Math.Min(A.Friction, B.Friction);
 
         // Calculate  the relative velocity between the two objects
-        var relativeVelocity = (A.Velocity - B.Velocity);
+        var ra = End - A.Position;
+        var rb = Start - B.Position;
+        var va = A.Velocity + new Vector2(-A.AngularVelocity * ra.Y, A.AngularVelocity * ra.X);
+        var vb = B.Velocity + new Vector2(-B.AngularVelocity * rb.Y, B.AngularVelocity * rb.X);
+        var relativeVelocity = va - vb;
 
-        // Calculate the relative velocity along the normal collision vector
+
+        // Now we proceed to Calculate the collision impulse along the normal
         var relativeVelocityDotNormal = relativeVelocity.Dot(ref Normal);
-
-        // Now we proceed to Calculate the collision impulse
-        var impulseDirection = Normal;
-        var impulseMagnitude = -(1 + e) * relativeVelocityDotNormal / (A.InvMass + B.InvMass);
-
-        var jn = impulseDirection * impulseMagnitude;
+        var impulseDirectionN = Normal;
+        var impulseMagnitudeN = -(1 + e) * relativeVelocityDotNormal / (A.InvMass + B.InvMass + 
+                                                                       ra.Cross(ref Normal) * ra.Cross(ref Normal) * A.InvI +
+                                                                       rb.Cross(ref Normal) * rb.Cross(ref Normal) * B.InvI);
+        var jN = impulseDirectionN * impulseMagnitudeN;
+        
+        // Now we proceed to Calculate the collision impulse along the normal
+        Vector2 tangent = Normal.Normal();
+        var relativeVelocityDotTangent = relativeVelocity.Dot(ref Normal);
+        var impulseDirectionT = Normal;
+        var impulseMagnitudeT =f * -(1 + e) * relativeVelocityDotTangent / (A.InvMass + B.InvMass + 
+                                                                        ra.Cross(ref tangent) * ra.Cross(ref tangent) * A.InvI +
+                                                                        rb.Cross(ref tangent) * rb.Cross(ref tangent) * B.InvI);
+        var jT = impulseDirectionT * impulseMagnitudeT;
+        
+        // Calculate the final impulse j combining normal and tangent impulses
+        var j = jN + jT;
 
         // Apply the impulse vector to both objects in opposite direction
-        A.ApplyImpulse(jn);
-        B.ApplyImpulse(Vector2.Negate(jn));
+        A.ApplyImpulse(j, ra);
+        B.ApplyImpulse(Vector2.Negate(j), rb);
     }
 }
