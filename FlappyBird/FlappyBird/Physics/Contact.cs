@@ -42,20 +42,20 @@ public class Contact
 
 
         // Now we proceed to Calculate the collision impulse along the normal
-        var relativeVelocityDotNormal = relativeVelocity.Dot(ref Normal);
+        var relativeVelocityDotNormal = relativeVelocity.Dot(Normal);
         var impulseDirectionN = Normal;
         var impulseMagnitudeN = -(1 + e) * relativeVelocityDotNormal / (A.InvMass + B.InvMass + 
-                                                                       ra.Cross(ref Normal) * ra.Cross(ref Normal) * A.InvI +
-                                                                       rb.Cross(ref Normal) * rb.Cross(ref Normal) * B.InvI);
+                                                                       ra.Cross(Normal) * ra.Cross(Normal) * A.InvI +
+                                                                       rb.Cross(Normal) * rb.Cross(Normal) * B.InvI);
         var jN = impulseDirectionN * impulseMagnitudeN;
         
         // Now we proceed to Calculate the collision impulse along the normal
         Vector2 tangent = Normal.Normal();
-        var relativeVelocityDotTangent = relativeVelocity.Dot(ref Normal);
+        var relativeVelocityDotTangent = relativeVelocity.Dot(Normal);
         var impulseDirectionT = Normal;
         var impulseMagnitudeT =f * -(1 + e) * relativeVelocityDotTangent / (A.InvMass + B.InvMass + 
-                                                                        ra.Cross(ref tangent) * ra.Cross(ref tangent) * A.InvI +
-                                                                        rb.Cross(ref tangent) * rb.Cross(ref tangent) * B.InvI);
+                                                                        ra.Cross(tangent) * ra.Cross(tangent) * A.InvI +
+                                                                        rb.Cross(tangent) * rb.Cross(tangent) * B.InvI);
         var jT = impulseDirectionT * impulseMagnitudeT;
         
         // Calculate the final impulse j combining normal and tangent impulses

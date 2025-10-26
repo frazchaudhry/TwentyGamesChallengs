@@ -94,7 +94,7 @@ public class Body
         if (IsStatic()) return;
 
         Velocity += j * InvMass;
-        AngularVelocity += r.Cross(ref j) * InvI;
+        AngularVelocity += r.Cross(j) * InvI;
     }
 
     public void IntegrateLinear(float dt)

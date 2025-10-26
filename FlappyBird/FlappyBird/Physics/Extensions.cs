@@ -34,12 +34,12 @@ public static class Extensions
         return result;
     }
 
-    public static float Dot(this Vector2 vec, ref Vector2 other)
+    public static float Dot(this Vector2 vec, Vector2 other)
     {
         return vec.X * other.X + vec.Y * other.Y;
     }
     
-    public static float Cross(this Vector2 vec, ref Vector2 other)
+    public static float Cross(this Vector2 vec, Vector2 other)
     {
         return vec.X * other.Y - vec.Y * other.X;
     }
