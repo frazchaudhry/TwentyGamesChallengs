@@ -8,6 +8,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nez.FNA.Core", "..\libs\Nez
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nez.FNA.Core.ImGui", "..\libs\Nez\Nez.ImGui\Nez.FNA.Core.ImGui.csproj", "{7CA9E03E-3179-49D7-B3B0-31DB3978EDD3}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FNA.Extended", "..\libs\Monogame-Extended\source\MonoGame.Extended\FNA.Extended.csproj", "{C059AD59-3EF0-4D4A-A07D-085FB9DD2153}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -34,5 +36,9 @@ Global
 		{7CA9E03E-3179-49D7-B3B0-31DB3978EDD3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7CA9E03E-3179-49D7-B3B0-31DB3978EDD3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7CA9E03E-3179-49D7-B3B0-31DB3978EDD3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C059AD59-3EF0-4D4A-A07D-085FB9DD2153}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C059AD59-3EF0-4D4A-A07D-085FB9DD2153}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C059AD59-3EF0-4D4A-A07D-085FB9DD2153}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C059AD59-3EF0-4D4A-A07D-085FB9DD2153}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

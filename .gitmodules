@@ -7,3 +7,6 @@
 [submodule "libs/FNA"]
 	path = libs/FNA
 	url = git@github.com:FNA-XNA/FNA.git
+[submodule "libs/Monogame-Extended"]
+	path = libs/Monogame-Extended
+	url = git@github.com:frazchaudhry/Monogame-Extended.git
