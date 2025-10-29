@@ -25,6 +25,9 @@ public class Background(Game game)
 
     public void Draw(GameTime gameTime)
     {
-        _game.SpriteBatch?.Draw(skyTexture, Vector2.Zero, Color.White);
+        for (var i = 0; i < 640; i += 64)
+        {
+            _game.SpriteBatch?.Draw(skyTexture, new Rectangle(i, 0, 64, 360), Color.White);
+        }
     }
 }
