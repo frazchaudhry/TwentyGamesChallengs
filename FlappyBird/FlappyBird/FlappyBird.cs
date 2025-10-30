@@ -3,31 +3,40 @@ using FlappyBird.Screens;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended.Screens;
+using MonoGame.Extended.ViewportAdapters;
 
 namespace FlappyBird;
 
 public class FlappyBird : Game
 {
-    private readonly GraphicsDeviceManager _graphicsDeviceManager;
     private readonly Dictionary<ScreenName, GameScreen> _screens = new();
     
     private readonly ScreenManager _screenManager;
     private ScreenName _currentScreen;
+    private readonly Background _background;
 
     public SpriteBatch? SpriteBatch;
-    public readonly Background _background;
+    public ViewportAdapter? ViewportAdapter;
+
+    // This is the working resolution of the game. Game coordinates will be according to this resolution
+    public static readonly int VirtualWidth = 640;
+    public static readonly int VirtualHeight = 360;
+    
+    // This is the size of the view port and will be scaled from the virtual (working) resolution
+    public static readonly int BackBufferWidth = 1280;
+    public static readonly int BackBufferHeight = 720;
 
     public FlappyBird()
     {
-        _graphicsDeviceManager = new GraphicsDeviceManager(this)
+        var graphicsDeviceManager = new GraphicsDeviceManager(this)
         {
             IsFullScreen = false,
-            PreferredBackBufferWidth = 640,
-            PreferredBackBufferHeight = 360,
+            PreferredBackBufferWidth = BackBufferWidth,
+            PreferredBackBufferHeight = BackBufferHeight,
             SynchronizeWithVerticalRetrace = true,
         };
 
-        _graphicsDeviceManager.ApplyChanges();
+        graphicsDeviceManager.ApplyChanges();
         Content.RootDirectory = "Content";
         Window.AllowUserResizing = true;
 
@@ -47,6 +56,8 @@ public class FlappyBird : Game
     protected override void LoadContent()
     {
         SpriteBatch = new SpriteBatch(GraphicsDevice);
+
+        ViewportAdapter = new BoxingViewportAdapter(Window, GraphicsDevice, VirtualWidth, VirtualHeight);
         
         LoadScreen(ScreenName.Title);
         base.LoadContent();
