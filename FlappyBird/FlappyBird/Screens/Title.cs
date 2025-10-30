@@ -9,9 +9,14 @@ public class Title(Game game, Background background) : GameScreen(game)
 {
     private readonly FlappyBird _game = (FlappyBird)game;
 
-    public override void LoadContent()
+    public override void Initialize()
     {
-        background.LoadContent();
+        background.Initialize();
+    }
+
+    public override void UnloadContent()
+    {
+        background.Dispose();
     }
 
     public override void Update(GameTime gameTime)

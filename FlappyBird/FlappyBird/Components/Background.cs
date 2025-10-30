@@ -4,26 +4,26 @@ using MonoGame.Extended;
 
 namespace FlappyBird.Components;
 
-public class Background(Game game)
+public class Background(Game game) : SimpleDrawableGameComponent
 {
     private readonly FlappyBird _game = (FlappyBird)game;
     private Texture2D? skyTexture;
 
-    public void LoadContent()
+    protected override void LoadContent()
     {
         skyTexture = game.Content.Load<Texture2D>("sky");
     }
 
-    public void UnloadContent()
+    protected override void UnloadContent()
     {
         skyTexture?.Dispose();
     }
 
-    public void Update(GameTime gameTime)
+    public override void Update(GameTime gameTime)
     {
     }
 
-    public void Draw(GameTime gameTime)
+    public override void Draw(GameTime gameTime)
     {
         for (var i = 0; i < 640; i += 64)
         {
