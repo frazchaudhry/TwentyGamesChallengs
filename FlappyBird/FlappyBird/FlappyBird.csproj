@@ -34,6 +34,10 @@
       <ProjectReference Include="..\..\libs\Nez\Nez.ImGui\Nez.FNA.Core.ImGui.csproj" />
       <ProjectReference Include="..\..\libs\Nez\Nez.Portable\Nez.FNA.Core.csproj" />
     </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Gum.FNA" Version="2025.10.25.1" />
+    </ItemGroup>
     
     <Target Name="CopyfnalibsToBuildDirectory" BeforeTargets="BeforeBuild">
         <ItemGroup>

@@ -9,6 +9,12 @@ public class Background(Game game) : SimpleDrawableGameComponent
     private readonly FlappyBird _game = (FlappyBird)game;
     private Texture2D? skyTexture;
 
+    public override void Initialize()
+    {
+        DrawOrder = -10;
+        base.Initialize();
+    }
+
     protected override void LoadContent()
     {
         skyTexture = game.Content.Load<Texture2D>("sky");

@@ -1,9 +1,12 @@
 using FlappyBird.Components;
 using FlappyBird.Screens;
+using Gum.Forms;
+using Gum.Forms.Controls;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended.Screens;
 using MonoGame.Extended.ViewportAdapters;
+using MonoGameGum;
 
 namespace FlappyBird;
 
@@ -17,6 +20,7 @@ public class FlappyBird : Game
 
     public SpriteBatch? SpriteBatch;
     public ViewportAdapter? ViewportAdapter;
+    public GumService GumUi => GumService.Default;
 
     // This is the working resolution of the game. Game coordinates will be according to this resolution
     public static readonly int VirtualWidth = 640;
@@ -36,20 +40,23 @@ public class FlappyBird : Game
             SynchronizeWithVerticalRetrace = true,
         };
 
-        graphicsDeviceManager.ApplyChanges();
         Content.RootDirectory = "Content";
         Window.AllowUserResizing = true;
 
         _screenManager = new ScreenManager();
         Components.Add(_screenManager);
         _background = new Background(this);
+
+        IsMouseVisible = true;
     }
 
     protected override void Initialize()
     {
         // Initialize Screens
         _screens.Add(ScreenName.Title, new Title(this, _background));
-        
+
+        GumUi.Initialize(this, DefaultVisualsVersion.V2);
+
         base.Initialize();
     }
 
