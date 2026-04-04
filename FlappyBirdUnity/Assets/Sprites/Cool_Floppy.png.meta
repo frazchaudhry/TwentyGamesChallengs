@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: f7e325f4ed25a15cf910b5a15eccf29b
+guid: ee334d6b3f207d841bd2854f229d1d3f
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -7347277767829423379
-    second: pipe_0
+      213: 3260904948931994847
+    second: Cool_Floppy_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -113,13 +113,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: pipe_0
+      name: Cool_Floppy_0
       rect:
         serializedVersion: 2
-        x: 0
-        y: 0
-        width: 64
-        height: 512
+        x: 7
+        y: 11
+        width: 55
+        height: 45
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -128,8 +128,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: deaf6663cc9390a90800000000000000
-      internalID: -7347277767829423379
+      spriteID: fd4a76726cf014d20800000000000000
+      internalID: 3260904948931994847
       vertices: []
       indices: 
       edges: []
@@ -148,7 +148,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      pipe_0: -7347277767829423379
+      Cool_Floppy_0: 3260904948931994847
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
