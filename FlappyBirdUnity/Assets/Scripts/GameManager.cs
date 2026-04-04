@@ -20,15 +20,9 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-
     public static float GetRandomObstaclePositionY()
     {
-        var randomY = Random.Range(-4.0f, 4.0f);
+        var randomY = Random.Range(-3.0f, 3.0f);
         var numSteps = Mathf.Floor(randomY / StepSize);
         return numSteps * StepSize;
     }
