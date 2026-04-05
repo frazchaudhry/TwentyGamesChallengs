@@ -18,6 +18,11 @@ public class Obstacle : MonoBehaviour
     {
         transform.Translate(Vector3.left * (speed * Time.deltaTime));
 
-        if (transform.position.x < MinPositionX) transform.position = new Vector3(MaxPositionX, GameManager.GetRandomObstaclePositionY(), 0.0f);
+        if (transform.position.x < MinPositionX) 
+        {
+            transform.position = 
+            new Vector3(MaxPositionX, GameManager.Instance.GetRandomObstaclePositionY(), 0.0f);
+            
+        }
     }
 }
