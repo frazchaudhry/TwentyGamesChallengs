@@ -175,9 +175,9 @@ Camera:
   m_NormalizedViewPortRect:
     serializedVersion: 2
     x: 0
-    y: 0
+    y: 0.0000538826
     width: 1
-    height: 1
+    height: 0.99989223
   near clip plane: 0.3
   far clip plane: 1000
   field of view: 60
@@ -930,6 +930,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Player
   upwardImpulse: 13
   rotationSpeed: 100
+  flapAction:
+    m_UseReference: 1
+    m_Action:
+      m_Name: Flap
+      m_Type: 0
+      m_ExpectedControlType: 
+      m_Id: 1fb64834-193e-4d72-a9cb-4f22adf6d745
+      m_Processors: 
+      m_Interactions: 
+      m_SingletonActionBindings: []
+      m_Flags: 0
+    m_Reference: {fileID: -2099379676528639254, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
 --- !u!61 &1696921481
 BoxCollider2D:
   m_ObjectHideFlags: 0
