@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ui:UXML
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:ui="UnityEngine.UIElements"
+        xmlns:uie="UnityEditor.UIElements" xmlns:ul="UnityEngine.UIElements"
+        xsi:noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd"
+        editor-extension-mode="false"
+        xsi:schemaLocation="UnityEngine.UIElements file:/home/fraz/Programs/DevProjects/TwentyGamesChallenge/FlappyBirdUnity/UIElementsSchema/UnityEngine.UIElements.xsd">
+   <ul:VisualElement style="flex-grow: 1;">
+       <ul:Button text="Play" name="play_button" />
+       <ul:Button text="Exit" name="exit_button" />
+   </ul:VisualElement>
+</ui:UXML>
